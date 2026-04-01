@@ -16,6 +16,21 @@ const routes = [
     name: "main",
     component: () => import("../pages/main-page.vue"),
   },
+  {
+    path: "/profile",
+    name: "profile",
+    component: () => import("../pages/profile-page.vue"),
+  },
+  {
+    path: "/tariffs",
+    name: "tariffs",
+    component: () => import("../pages/tariff-page.vue"),
+  },
+  {
+    path: "/settings",
+    name: "settings",
+    component: () => import("../pages/settings-page.vue"),
+  },
 ];
 
 const router = createRouter({
