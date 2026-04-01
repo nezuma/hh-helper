@@ -1,20 +1,29 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+// src/main/main.ts
+import "dotenv/config";
 import { join } from "path";
+import { fileURLToPath } from "url";
+import { app, BrowserWindow } from "electron";
 
-let mainWindow: BrowserWindow | null = null;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = join(__filename, "..");
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
+  const isDev = process.env.NODE_ENV === "development";
+
+  // В dev режиме используем исходный файл
+  const preloadPath = isDev
+    ? join(__dirname, "../../src/preload/preload.ts")
+    : join(__dirname, "../preload/preload.js");
+
+  const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-      preload: join(__dirname, "../preload/preload.js"),
+      preload: preloadPath,
       nodeIntegration: false,
       contextIsolation: true,
     },
   });
-
-  const isDev = process.env.NODE_ENV === "development";
 
   if (isDev) {
     mainWindow.loadURL("http://localhost:5173");
@@ -22,27 +31,6 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
   }
-
-  mainWindow.on("closed", () => {
-    mainWindow = null;
-  });
 }
 
-app.whenReady().then(() => {
-  createWindow();
-
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
-
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
-});
-
-// ЕБАНЫЙ МОСТ МЕЖДУ RENDERER И MAIN
-// ТОЛЬКО ПРОКИДЫВАЕМ СООБЩЕНИЯ, БЕЗ ЛОГИКИ
-
-ipcMain.handle("electron:ping", () => {
-  return "pong";
-});
+app.whenReady().then(createWindow);

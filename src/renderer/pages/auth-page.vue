@@ -11,7 +11,7 @@ const handleClose = () => {
 
 const handleLogin = (data: { login: string; password: string }) => {
   console.log("Login:", data);
-  router.push("/");
+  router.push("/main");
 };
 
 const handleRegister = (data: {

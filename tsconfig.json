@@ -40,6 +40,7 @@
     "outDir": "dist",
     "sourceMap": true
   },
+  "types": ["vite/client"],
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",

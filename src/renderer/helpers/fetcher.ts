@@ -9,7 +9,7 @@ interface IFetcher {
 }
 
 export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
-  const api = import.meta.env.VITE_API_URL;
+  const api = process.env.API_URL;
   try {
     const res = await fetch(`${api}${url}`, {
       method: method,
