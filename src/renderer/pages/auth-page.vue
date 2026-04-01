@@ -10,8 +10,7 @@ const handleClose = () => {
 };
 
 const handleLogin = (data: { login: string; password: string }) => {
-  console.log("Login:", data);
-  router.push("/main");
+  router.push("/auth/accept");
 };
 
 const handleRegister = (data: {

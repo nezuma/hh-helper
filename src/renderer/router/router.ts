@@ -31,6 +31,11 @@ const routes = [
     name: "settings",
     component: () => import("../pages/settings-page.vue"),
   },
+  {
+    path: "/auth/accept",
+    name: "auth-accept",
+    component: () => import("../pages/auth-accept.vue"),
+  },
 ];
 
 const router = createRouter({
