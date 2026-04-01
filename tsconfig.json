@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    // Базовые настройки
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "moduleResolution": "bundler",
+
+    // Строгий режим
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Модули и резолвинг
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    // Пути для импортов
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@renderer/*": ["src/renderer/*"],
+      "@main/*": ["src/main/*"],
+      "@preload/*": ["src/preload/*"],
+      "@components/*": ["src/renderer/components/*"],
+      "@composables/*": ["src/renderer/composables/*"],
+      "@types/*": ["src/types/*"]
+    },
+
+    // Дополнительные настройки
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "declaration": false,
+    "outDir": "dist",
+    "sourceMap": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.vue",
+    "src/**/*.tsx",
+    "src/types/**/*.d.ts"
+  ],
+  "exclude": ["node_modules", "dist", "release", "**/*.spec.ts"]
+}

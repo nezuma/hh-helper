@@ -1,0 +1,114 @@
+/* Hairline / Thin */
+@font-face {
+  font-family: "SamsungOne";
+  src: url("SamsungOne-Hairline.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+}
+
+/* Thin / Extra Light */
+@font-face {
+  font-family: "SamsungOne";
+  src: url("SamsungOne-Thin.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+/* Light */
+@font-face {
+  font-family: "SamsungOne";
+  src: url("SamsungOne-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Regular / Normal */
+@font-face {
+  font-family: "SamsungOne";
+  src: url("SamsungOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Medium */
+@font-face {
+  font-family: "SamsungOne";
+  src: url("SamsungOne-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Semi Bold */
+@font-face {
+  font-family: "SamsungOne";
+  src: url("SamsungOne-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Bold */
+@font-face {
+  font-family: "SamsungOne";
+  src: url("SamsungOne-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Extra Bold */
+@font-face {
+  font-family: "SamsungOne";
+  src: url("SamsungOne-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+/* Black / Heavy */
+@font-face {
+  font-family: "SamsungOne";
+  src: url("SamsungOne-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+* {
+  font-family: "Strogo-Regular", sans-serif;
+  text-decoration: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Основной контейнер скроллбара (вся полоса прокрутки) */
+::-webkit-scrollbar {
+  width: 8px; /* Ширина вертикального скроллбара */
+  height: 8px; /* Высота горизонтального скроллбара */
+}
+
+/* Дорожка (трек) - фон по которому движется ползунок */
+::-webkit-scrollbar-track {
+  background: #1a1a2e; /* Цвет фона дорожки */
+}
+
+/* Ползунок - движущаяся часть скроллбара */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    135deg,
+    #18274e,
+    #18274e
+  ); /* Градиент для ползунка */
+  border-radius: 10px; /* Скругление углов ползунка */
+  transition: background 0.2s ease; /* Плавный переход при наведении */
+}
+
+/* Ползунок при наведении мыши */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    135deg,
+    #60a5fa,
+    #3b82f6
+  ); /* Светлее при наведении */
+}
+
+/* Уголок между горизонтальным и вертикальным скроллбаром */
+::-webkit-scrollbar-corner {
+  background: transparent; /* Прозрачный уголок */
+}
