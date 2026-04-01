@@ -1,5 +1,6 @@
+// Обновленный fetcher.ts
 import router from "../router/router";
-import { emitter } from "../composables/eventBus";
+import { useNotification } from "../composables/useNotification";
 
 interface IFetcher {
   url: string;
@@ -9,7 +10,11 @@ interface IFetcher {
 }
 
 export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
-  const api = process.env.API_URL;
+  const { showSuccess, showError } = useNotification();
+
+  // Используем import.meta.env вместо process.env
+  const api = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
   try {
     const res = await fetch(`${api}${url}`, {
       method: method,
@@ -22,7 +27,7 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
 
     if (data) {
       if (!res.ok && data.alert == true) {
-        emitter.emit("show-error", data.msg || data);
+        showError(data.msg || "Произошла ошибка");
         if (res.status == 401) {
           router.push("/auth");
         }
@@ -31,22 +36,17 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
         return data;
       }
       if (data.code) {
-        console.log(
-          `${data.msg} | Код видимый администрации: ${String(data.code)}`,
-        );
-        emitter.emit(
-          "show-success",
-          `${data.msg} | Код видимый администрации: ${String(data.code)}`,
-        );
+        console.log(`${data.msg} | Код: ${String(data.code)}`);
+        showSuccess(`${data.msg} | Код: ${String(data.code)}`);
         return data;
       }
-      emitter.emit("show-success", data.msg);
+      showSuccess(data.msg);
       return data;
     }
 
     return;
   } catch (e) {
     console.log(e);
-    emitter.emit("show-error", "Непредвиденная ошибка");
+    showError("Непредвиденная ошибка");
   }
 };

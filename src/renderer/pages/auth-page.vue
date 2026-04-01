@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import AuthModal from "../components/auth-modal.vue";
 import { useRouter } from "vue-router";
+import { fetcher } from "../helpers";
 
 const router = useRouter();
 
@@ -10,15 +11,15 @@ const handleClose = () => {
 };
 
 const handleLogin = (data: { login: string; password: string }) => {
-  router.push("/auth/accept");
+  router.push("/main");
 };
 
-const handleRegister = (data: {
+const handleRegister = async (data: {
   email: string;
   login: string;
   password: string;
 }) => {
-  console.log("Register:", data);
+  await fetcher({ url: "/register", method: "POST", body: data });
   router.push("/");
 };
 </script>
