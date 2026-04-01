@@ -83,7 +83,7 @@ onMounted(() => {
 
     <main class="main">
       <div v-if="!isAuthenticated" class="hero">
-        <h1 class="title">HH Помощник</h1>
+        <h1 class="title">hh.ru Помощник</h1>
         <p class="subtitle">
           Я автоматизированный помощник для поиска работы! =)
         </p>
