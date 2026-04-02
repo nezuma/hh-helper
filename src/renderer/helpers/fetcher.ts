@@ -1,6 +1,7 @@
 // Обновленный fetcher.ts
 import router from "../router/router";
 import { useNotification } from "../composables/eventBus";
+import { setCookie } from "./setCookies";
 
 interface IFetcher {
   url: string;
@@ -13,9 +14,11 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
   const { showSuccess, showError } = useNotification();
 
   const api = import.meta.env.VITE_API_URL || "http://localhost:4000";
+  const query = window.location.search;
+  console.log(query);
 
   try {
-    const res = await fetch(`${api}${url}`, {
+    const res = await fetch(`${api}${url}${query ? query : ""}`, {
       method: method,
       headers: headers || { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -36,13 +39,14 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
       if (!data.alert) {
         return data;
       }
-      if (data.code) {
-        console.log(`${data.msg} | Код: ${String(data.code)}`);
-        showSuccess(`${data.msg} | Код: ${String(data.code)}`);
-        return data;
+      if (data.accessToken) {
+        setCookie("accessToken", data.accessToken, 15 * 60 * 1000);
+      }
+      if (data.refreshToken) {
+        setCookie("refreshToken", data.refreshToken, 7 * 24 * 60 * 1000);
       }
       showSuccess(data.msg);
-      return data;
+      return { ...data, success: true };
     }
 
     return;

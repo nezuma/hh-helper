@@ -21,8 +21,14 @@ const handleRegister = async (data: {
   confirmPassword: string;
 }) => {
   console.log(data);
-  await fetcher({ url: "/register", method: "POST", body: data });
-  // router.push("/");
+  const response = await fetcher({
+    url: "/register",
+    method: "POST",
+    body: data,
+  });
+  if (response.success === true) {
+    router.push("/register/success");
+  }
 };
 </script>
 

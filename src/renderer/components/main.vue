@@ -1,27 +1,13 @@
 <!-- main.vue (обновленный) -->
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-const isAuthenticated = ref(false);
 const profile = ref<any>(null);
 const mouseX = ref(0);
 const mouseY = ref(0);
 const appRef = ref<HTMLElement | null>(null);
-
-const settings = ref({
-  botEnabled: false,
-  autoApply: false,
-  autoBoost: false,
-});
-
-const avatarUrl = computed(() => profile.value?.avatar || "");
-const userInitials = computed(() => {
-  if (!profile.value) return "";
-  const name = profile.value.name || profile.value.email || "";
-  return name.charAt(0).toUpperCase();
-});
 
 const checkAuth = async () => {
   try {
@@ -32,13 +18,10 @@ const checkAuth = async () => {
     if (response.ok) {
       const data = await response.json();
       profile.value = data;
-      isAuthenticated.value = true;
     } else {
-      isAuthenticated.value = false;
       profile.value = null;
     }
   } catch (error) {
-    isAuthenticated.value = false;
     profile.value = null;
   }
 };
@@ -54,10 +37,6 @@ const openAuth = () => {
   router.push("/auth");
 };
 
-const openProfile = () => {
-  console.log("Open profile");
-};
-
 onMounted(() => {
   checkAuth();
 });
@@ -70,19 +49,12 @@ onMounted(() => {
         <h1 class="logo">HH Helper</h1>
       </div>
       <div class="header-right">
-        <button v-if="!isAuthenticated" @click="openAuth" class="auth-btn">
-          Войти
-        </button>
-        <div v-else class="avatar" @click="openProfile">
-          <div v-if="!avatarUrl" class="avatar-placeholder">
-            {{ userInitials }}
-          </div>
-        </div>
+        <button @click="openAuth" class="auth-btn">Войти</button>
       </div>
     </header>
 
     <main class="main">
-      <div v-if="!isAuthenticated" class="hero">
+      <div class="hero">
         <h1 class="title">hh.ru Помощник</h1>
         <p class="subtitle">
           Я автоматизированный помощник для поиска работы! =)
@@ -93,51 +65,9 @@ onMounted(() => {
           </button>
         </div>
       </div>
-
-      <div v-else class="dashboard">
-        <div class="toggles">
-          <div class="toggle-card">
-            <div class="toggle-info">
-              <span class="toggle-title">Бот</span>
-              <span class="toggle-desc">Включить/выключить работу бота</span>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" v-model="settings.botEnabled" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-
-          <div class="toggle-card">
-            <div class="toggle-info">
-              <span class="toggle-title">Автоотклик</span>
-              <span class="toggle-desc"
-                >Автоматически откликаться на вакансии</span
-              >
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" v-model="settings.autoApply" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-
-          <div class="toggle-card">
-            <div class="toggle-info">
-              <span class="toggle-title">Автоподъем резюме</span>
-              <span class="toggle-desc"
-                >Автоматически поднимать резюме в поиске</span
-              >
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" v-model="settings.autoBoost" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-      </div>
     </main>
 
     <div
-      v-if="!isAuthenticated"
       class="mouse-light"
       :style="{ transform: `translate(${mouseX}px, ${mouseY}px)` }"
     ></div>

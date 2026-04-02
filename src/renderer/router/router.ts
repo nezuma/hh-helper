@@ -32,14 +32,19 @@ const routes = [
     component: () => import("../pages/settings-page.vue"),
   },
   {
-    path: "/auth/accept",
+    path: "/register/accept",
     name: "auth-accept",
-    component: () => import("../pages/auth-accept.vue"),
+    component: () => import("../pages/register-accept-page.vue"),
   },
   {
     path: "/privacy-policy",
     name: "privacy-policy",
     component: () => import("../pages/privacy-policy-page.vue"),
+  },
+  {
+    path: "/register/success",
+    name: "success-register",
+    component: () => import("../pages/register-success-page.vue"),
   },
 ];
 

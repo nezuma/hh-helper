@@ -1,4 +1,4 @@
-<!-- src/renderer/views/WaitingView.vue -->
+<!-- src/renderer/views/RegisterSuccessView.vue -->
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 
@@ -10,7 +10,7 @@ const goToHome = () => {
 </script>
 
 <template>
-  <div class="waiting-view">
+  <div class="register-success-view">
     <header class="header">
       <div class="header-left">
         <button class="back-btn" @click="goToHome">
@@ -30,8 +30,8 @@ const goToHome = () => {
       </div>
     </header>
 
-    <div class="waiting-container">
-      <div class="waiting-card">
+    <div class="success-container">
+      <div class="success-card">
         <div class="success-icon">
           <svg
             viewBox="0 0 24 24"
@@ -42,16 +42,19 @@ const goToHome = () => {
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </div>
-        <h2 class="waiting-title">Регистрация успешна!</h2>
-        <p class="waiting-message">Ждем подтверждения по почте</p>
-        <button class="waiting-btn" @click="goToHome">На главную</button>
+        <h2 class="success-title">Регистрация успешна!</h2>
+        <p class="success-message">
+          Мы отправили вам сообщение на почту. Для подтверждения регистрации
+          нажмите на кнопку в письме.
+        </p>
+        <button class="success-btn" @click="goToHome">На главную</button>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.waiting-view {
+.register-success-view {
   min-height: 100vh;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
 }
@@ -106,7 +109,7 @@ const goToHome = () => {
   background-clip: text;
 }
 
-.waiting-container {
+.success-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -114,13 +117,13 @@ const goToHome = () => {
   padding: 40px;
 }
 
-.waiting-card {
+.success-card {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 48px;
-  max-width: 480px;
+  max-width: 500px;
   width: 100%;
   text-align: center;
   animation: fadeIn 0.3s ease;
@@ -144,20 +147,21 @@ const goToHome = () => {
   color: #4ade80;
 }
 
-.waiting-title {
+.success-title {
   font-size: 28px;
   font-weight: 700;
   color: white;
   margin-bottom: 16px;
 }
 
-.waiting-message {
+.success-message {
   font-size: 16px;
   color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
   margin-bottom: 32px;
 }
 
-.waiting-btn {
+.success-btn {
   padding: 12px 32px;
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   border: none;
@@ -169,7 +173,7 @@ const goToHome = () => {
   transition: all 0.2s;
 }
 
-.waiting-btn:hover {
+.success-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
@@ -201,15 +205,15 @@ const goToHome = () => {
     padding: 16px 20px;
   }
 
-  .waiting-container {
+  .success-container {
     padding: 20px;
   }
 
-  .waiting-card {
+  .success-card {
     padding: 32px 24px;
   }
 
-  .waiting-title {
+  .success-title {
     font-size: 24px;
   }
 
