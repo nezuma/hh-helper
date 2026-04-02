@@ -172,6 +172,7 @@ const copyPromoCode = () => {
                 width="800px"
                 height="800px"
                 viewBox="0 0 24 24"
+                fill="#fff"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path

@@ -1,6 +1,6 @@
 // Обновленный fetcher.ts
 import router from "../router/router";
-import { useNotification } from "../composables/useNotification";
+import { useNotification } from "../composables/eventBus";
 
 interface IFetcher {
   url: string;
@@ -12,7 +12,6 @@ interface IFetcher {
 export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
   const { showSuccess, showError } = useNotification();
 
-  // Используем import.meta.env вместо process.env
   const api = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   try {
@@ -28,9 +27,11 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
     if (data) {
       if (!res.ok && data.alert == true) {
         showError(data.msg || "Произошла ошибка");
+        console.log(1);
         if (res.status == 401) {
           router.push("/auth");
         }
+        return data;
       }
       if (!data.alert) {
         return data;
@@ -47,6 +48,23 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
     return;
   } catch (e) {
     console.log(e);
-    showError("Непредвиденная ошибка");
+
+    // Проверяем тип ошибки
+    if (e instanceof TypeError && e.message === "Failed to fetch") {
+      showError("Не удалось подключиться к серверу. Проверьте соединение.");
+    }
+    // Проверка на ошибку соединения (ERR_CONNECTION_REFUSED)
+    else if (
+      e instanceof Error &&
+      e.message.includes("ERR_CONNECTION_REFUSED")
+    ) {
+      showError("Сервер недоступен. Пожалуйста, попробуйте позже.");
+    } else if (e instanceof Error && e.message.includes("NetworkError")) {
+      showError("Ошибка сети. Проверьте интернет-соединение.");
+    } else if (e instanceof Error && e.message.includes("timeout")) {
+      showError("Превышено время ожидания ответа от сервера.");
+    } else {
+      showError("Непредвиденная ошибка. Попробуйте позже.");
+    }
   }
 };

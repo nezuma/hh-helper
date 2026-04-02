@@ -1,13 +1,23 @@
 // composables/useNotification.ts
-import { getCurrentInstance } from "vue";
+import { ref } from "vue";
+
+// Глобальный Event Bus для уведомлений
+export const notificationBus = ref<{
+  showSuccess: ((message: string) => void) | null;
+  showError: ((message: string) => void) | null;
+  showInfo: ((message: string) => void) | null;
+}>({
+  showSuccess: null,
+  showError: null,
+  showInfo: null,
+});
 
 export const useNotification = () => {
-  const instance = getCurrentInstance();
-
   const showSuccess = (message: string) => {
-    if (instance?.appContext.config.globalProperties.$toast) {
-      instance.appContext.config.globalProperties.$toast("success", message);
+    if (notificationBus.value.showSuccess) {
+      notificationBus.value.showSuccess(message);
     } else {
+      // Fallback: через CustomEvent
       window.dispatchEvent(
         new CustomEvent("notification-toast", {
           detail: { type: "success", message },
@@ -17,8 +27,8 @@ export const useNotification = () => {
   };
 
   const showError = (message: string) => {
-    if (instance?.appContext.config.globalProperties.$toast) {
-      instance.appContext.config.globalProperties.$toast("error", message);
+    if (notificationBus.value.showError) {
+      notificationBus.value.showError(message);
     } else {
       window.dispatchEvent(
         new CustomEvent("notification-toast", {
@@ -29,8 +39,8 @@ export const useNotification = () => {
   };
 
   const showInfo = (message: string) => {
-    if (instance?.appContext.config.globalProperties.$toast) {
-      instance.appContext.config.globalProperties.$toast("info", message);
+    if (notificationBus.value.showInfo) {
+      notificationBus.value.showInfo(message);
     } else {
       window.dispatchEvent(
         new CustomEvent("notification-toast", {

@@ -18,9 +18,11 @@ const handleRegister = async (data: {
   email: string;
   login: string;
   password: string;
+  confirmPassword: string;
 }) => {
+  console.log(data);
   await fetcher({ url: "/register", method: "POST", body: data });
-  router.push("/");
+  // router.push("/");
 };
 </script>
 

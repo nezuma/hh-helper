@@ -36,6 +36,11 @@ const routes = [
     name: "auth-accept",
     component: () => import("../pages/auth-accept.vue"),
   },
+  {
+    path: "/privacy-policy",
+    name: "privacy-policy",
+    component: () => import("../pages/privacy-policy-page.vue"),
+  },
 ];
 
 const router = createRouter({

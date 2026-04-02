@@ -8,13 +8,20 @@
 
 <script setup lang="ts">
 import NotificationToast from "./components/notification-toast.vue";
-import { toastRef } from "./main";
-import { onMounted } from "vue";
+import { notificationBus } from "./composables/eventBus";
+import { onMounted, ref } from "vue";
+
+const toastRef = ref<InstanceType<typeof NotificationToast> | null>(null);
 
 onMounted(() => {
-  // Передаем ref в main
+  // Регистрируем методы в глобальный bus
   if (toastRef.value) {
-    console.log("Toast ready");
+    notificationBus.value.showSuccess = (msg: string) =>
+      toastRef.value?.showSuccess(msg);
+    notificationBus.value.showError = (msg: string) =>
+      toastRef.value?.showError(msg);
+    notificationBus.value.showInfo = (msg: string) =>
+      toastRef.value?.showInfo(msg);
   }
 });
 </script>

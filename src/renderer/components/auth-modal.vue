@@ -1,11 +1,19 @@
 <!-- components/AuthModal.vue -->
 <script setup lang="ts">
 import { ref, nextTick } from "vue";
+import { useRouter } from "vue-router";
+import { useNotification } from "../composables/eventBus";
 
+const { showError } = useNotification();
+
+const router = useRouter();
 const isLoginMode = ref(true);
 const isAnimating = ref(false);
 const showContent = ref(true);
 const showSvg = ref(false);
+const acceptPolicy = ref(false);
+const isLoginLoading = ref(false);
+const isRegisterLoading = ref(false);
 
 const loginForm = ref({
   login: "",
@@ -24,7 +32,12 @@ const emit = defineEmits<{
   (e: "login", data: { login: string; password: string }): void;
   (
     e: "register",
-    data: { email: string; login: string; password: string },
+    data: {
+      email: string;
+      login: string;
+      password: string;
+      confirmPassword: string;
+    },
   ): void;
 }>();
 
@@ -34,11 +47,9 @@ const animate = async (targetMode: boolean) => {
 
   const modal = document.querySelector(".auth-modal") as HTMLElement;
 
-  // 1. удаление содержимого блока
   showContent.value = false;
   await nextTick();
 
-  // 2. уменьшение до кружочка
   modal.style.transition = "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
   modal.style.width = "80px";
   modal.style.minHeight = "80px";
@@ -47,7 +58,6 @@ const animate = async (targetMode: boolean) => {
 
   await new Promise((resolve) => setTimeout(resolve, 300));
 
-  // 3. добавление svg
   showSvg.value = true;
   await nextTick();
 
@@ -56,7 +66,6 @@ const animate = async (targetMode: boolean) => {
     svgContainer.style.borderRadius = "50%";
     svgContainer.style.transition = "all 0.1s ease";
 
-    // анимация свечения (3 моргания)
     for (let i = 0; i < 2; i++) {
       svgContainer.style.transition = "all 0.1s ease";
       await new Promise((resolve) => setTimeout(resolve, 150));
@@ -66,7 +75,6 @@ const animate = async (targetMode: boolean) => {
     }
   }
 
-  // 4. удаление svg, border и свечения
   if (svgContainer) {
     svgContainer.style.border = "none";
     await new Promise((resolve) => setTimeout(resolve, 150));
@@ -77,10 +85,8 @@ const animate = async (targetMode: boolean) => {
   showSvg.value = false;
   await nextTick();
 
-  // смена режима
   isLoginMode.value = targetMode;
 
-  // 5. расширение блока до нужного размера
   modal.style.width = "400px";
   modal.style.minHeight = "464px";
   modal.style.borderRadius = "16px";
@@ -88,7 +94,6 @@ const animate = async (targetMode: boolean) => {
 
   await new Promise((resolve) => setTimeout(resolve, 300));
 
-  // 6. отображение содержимого блока
   showContent.value = true;
   await nextTick();
 
@@ -98,20 +103,49 @@ const animate = async (targetMode: boolean) => {
 const switchToRegister = () => animate(false);
 const switchToLogin = () => animate(true);
 
-const handleLogin = () => {
-  emit("login", loginForm.value);
+const handleLogin = async () => {
+  if (isLoginLoading.value) return;
+  isLoginLoading.value = true;
+
+  try {
+    await emit("login", loginForm.value);
+  } finally {
+    setTimeout(() => {
+      isLoginLoading.value = false;
+    }, 500);
+  }
 };
 
-const handleRegister = () => {
+const handleRegister = async () => {
+  if (isRegisterLoading.value) return;
+
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
     console.log("Пароли не совпадают");
     return;
   }
-  emit("register", {
-    email: registerForm.value.email,
-    login: registerForm.value.login,
-    password: registerForm.value.password,
-  });
+  if (!acceptPolicy.value) {
+    showError("Необходимо принять политику конфиденциальности");
+    return;
+  }
+
+  isRegisterLoading.value = true;
+
+  try {
+    await emit("register", {
+      email: registerForm.value.email,
+      login: registerForm.value.login,
+      password: registerForm.value.password,
+      confirmPassword: registerForm.value.confirmPassword,
+    });
+  } finally {
+    setTimeout(() => {
+      isRegisterLoading.value = false;
+    }, 500);
+  }
+};
+
+const openPrivacyPolicy = () => {
+  router.push("/privacy-policy");
 };
 </script>
 
@@ -127,15 +161,28 @@ const handleRegister = () => {
             type="text"
             placeholder="Логин"
             class="auth-input"
+            :disabled="isLoginLoading"
           />
           <input
             v-model="loginForm.password"
             type="password"
             placeholder="Пароль"
             class="auth-input"
+            :disabled="isLoginLoading"
           />
-          <button @click="handleLogin" class="auth-btn-submit">Войти</button>
-          <button @click="switchToRegister" class="auth-link">
+          <button
+            @click="handleLogin"
+            class="auth-btn-submit"
+            :disabled="isLoginLoading"
+          >
+            <span v-if="!isLoginLoading">Войти</span>
+            <span v-else class="btn-loader"></span>
+          </button>
+          <button
+            @click="switchToRegister"
+            class="auth-link"
+            :disabled="isLoginLoading"
+          >
             Еще нет аккаунта?
           </button>
         </div>
@@ -146,29 +193,66 @@ const handleRegister = () => {
             type="email"
             placeholder="Почта"
             class="auth-input"
+            :disabled="isRegisterLoading"
           />
           <input
             v-model="registerForm.login"
             type="text"
             placeholder="Логин"
             class="auth-input"
+            :disabled="isRegisterLoading"
           />
           <input
             v-model="registerForm.password"
             type="password"
             placeholder="Пароль"
             class="auth-input"
+            :disabled="isRegisterLoading"
           />
           <input
             v-model="registerForm.confirmPassword"
             type="password"
             placeholder="Подтверждение пароля"
             class="auth-input"
+            :disabled="isRegisterLoading"
           />
-          <button @click="handleRegister" class="auth-btn-submit">
-            Зарегистрироваться
+
+          <label
+            class="checkbox-label"
+            :class="{ disabled: isRegisterLoading }"
+          >
+            <input
+              type="checkbox"
+              v-model="acceptPolicy"
+              :disabled="isRegisterLoading"
+            />
+            <span class="checkmark"></span>
+            <span class="checkbox-text">
+              Я принимаю
+              <button
+                type="button"
+                @click="openPrivacyPolicy"
+                class="policy-link"
+                :disabled="isRegisterLoading"
+              >
+                политику конфиденциальности
+              </button>
+            </span>
+          </label>
+
+          <button
+            @click="handleRegister"
+            class="auth-btn-submit"
+            :disabled="isRegisterLoading"
+          >
+            <span v-if="!isRegisterLoading">Зарегистрироваться</span>
+            <span v-else class="btn-loader"></span>
           </button>
-          <button @click="switchToLogin" class="auth-link">
+          <button
+            @click="switchToLogin"
+            class="auth-link"
+            :disabled="isRegisterLoading"
+          >
             Уже есть аккаунт?
           </button>
         </div>
@@ -246,7 +330,6 @@ const handleRegister = () => {
 .circle-icon {
   width: 80px;
   height: 80px;
-  /* background: linear-gradient(135deg, #3b82f6, #2563eb); */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -295,6 +378,94 @@ const handleRegister = () => {
   color: rgba(255, 255, 255, 0.5);
 }
 
+.auth-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-left: 8px;
+}
+
+.checkbox-label.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checkbox-label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.checkbox-label:hover .checkmark {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #3b82f6;
+}
+
+.checkbox-label input:checked ~ .checkmark {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-color: #3b82f6;
+}
+
+.checkbox-label input:checked ~ .checkmark::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.policy-link {
+  background: none;
+  border: none;
+  color: #60a5fa;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+  padding: 0;
+  margin: 0;
+  transition: color 0.2s;
+}
+
+.policy-link:hover {
+  color: #3b82f6;
+}
+
+.policy-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .auth-btn-submit {
   padding: 12px;
   background: linear-gradient(135deg, #3b82f6, #2563eb);
@@ -306,11 +477,30 @@ const handleRegister = () => {
   cursor: pointer;
   transition: all 0.2s;
   margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
 }
 
-.auth-btn-submit:hover {
+.auth-btn-submit:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.auth-btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
 }
 
 .auth-link {
@@ -323,8 +513,13 @@ const handleRegister = () => {
   text-decoration: underline;
 }
 
-.auth-link:hover {
+.auth-link:hover:not(:disabled) {
   color: #3b82f6;
+}
+
+.auth-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @keyframes scaleIn {
@@ -346,6 +541,15 @@ const handleRegister = () => {
   100% {
     transform: rotate(0deg) scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 </style>
