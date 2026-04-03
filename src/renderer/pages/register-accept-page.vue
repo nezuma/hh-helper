@@ -7,7 +7,7 @@ import { useNotification } from "../composables/eventBus";
 
 const router = useRouter();
 const route = useRoute();
-const { showError, showSuccess } = useNotification();
+const { showError } = useNotification();
 const isLoading = ref(true);
 const errorMessage = ref("");
 
@@ -27,7 +27,6 @@ onMounted(async () => {
   if (!token || !email || !userId) {
     errorMessage.value = "Недействительная ссылка подтверждения";
     isLoading.value = false;
-    showError("Недействительная ссылка подтверждения");
     return;
   }
 
@@ -38,7 +37,6 @@ onMounted(async () => {
     });
 
     if (response) {
-      showSuccess("Почта успешно подтверждена!");
       setTimeout(() => {
         window.close();
       }, 2000);

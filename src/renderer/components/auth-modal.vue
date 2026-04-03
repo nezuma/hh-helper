@@ -3,6 +3,7 @@
 import { ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { useNotification } from "../composables/eventBus";
+import MainHeaderWithHouse from "./main-header-with-house.vue";
 
 const { showError } = useNotification();
 
@@ -35,6 +36,12 @@ const registerErrors = ref({
   confirmPassword: "",
 });
 
+// Валидация логина (только латиница и цифры)
+const validateLoginChars = (login: string) => {
+  const regex = /^[a-zA-Z0-9]*$/;
+  return regex.test(login);
+};
+
 const validateRegisterForm = () => {
   let isValid = true;
 
@@ -55,12 +62,16 @@ const validateRegisterForm = () => {
     isValid = false;
   }
 
-  // Проверка логина
+  // Проверка логина (только латиница и цифры)
   if (!registerForm.value.login.trim()) {
     registerErrors.value.login = "Введите логин";
     isValid = false;
   } else if (registerForm.value.login.length < 3) {
     registerErrors.value.login = "Логин должен содержать не менее 3 символов";
+    isValid = false;
+  } else if (!validateLoginChars(registerForm.value.login)) {
+    registerErrors.value.login =
+      "Логин может содержать только латинские буквы и цифры";
     isValid = false;
   }
 
@@ -224,32 +235,11 @@ const handleRegister = async () => {
 const openPrivacyPolicy = () => {
   router.push("/privacy-policy");
 };
-
-const goToHome = () => {
-  router.push("/");
-};
 </script>
 
 <template>
   <div class="auth-overlay">
-    <header class="auth-header">
-      <div class="header-left">
-        <button class="back-btn" @click="goToHome">
-          <svg
-            class="home-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-8H9v8H5a2 2 0 0 1-2-2z"
-            />
-          </svg>
-        </button>
-        <h1 class="logo">HH Helper</h1>
-      </div>
-    </header>
+    <MainHeaderWithHouse />
 
     <div class="auth-modal-wrapper">
       <div class="auth-modal">
@@ -318,6 +308,7 @@ const goToHome = () => {
               <span v-if="registerErrors.login" class="error-message">{{
                 registerErrors.login
               }}</span>
+              <span class="hint-message">Только латинские буквы и цифры</span>
             </div>
 
             <div class="input-wrapper">
@@ -332,6 +323,7 @@ const goToHome = () => {
               <span v-if="registerErrors.password" class="error-message">{{
                 registerErrors.password
               }}</span>
+              <span class="hint-message">Минимум 6 символов</span>
             </div>
 
             <div class="input-wrapper">
@@ -432,59 +424,6 @@ const goToHome = () => {
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
   z-index: 1000;
   overflow-y: auto;
-}
-
-.auth-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.back-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
-}
-
-.home-icon {
-  width: 20px;
-  height: 20px;
-  color: white;
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .auth-modal-wrapper {
@@ -786,5 +725,11 @@ const goToHome = () => {
     font-size: 20px;
     margin-bottom: 20px;
   }
+}
+.hint-message {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 4px;
+  margin-top: 2px;
 }
 </style>

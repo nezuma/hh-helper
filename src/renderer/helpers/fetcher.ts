@@ -15,7 +15,6 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
 
   const api = import.meta.env.VITE_API_URL || "http://localhost:4000";
   const query = window.location.search;
-  console.log(query);
 
   try {
     const res = await fetch(`${api}${url}${query ? query : ""}`, {
@@ -30,7 +29,6 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
     if (data) {
       if (!res.ok && data.alert == true) {
         showError(data.msg || "Произошла ошибка");
-        console.log(1);
         if (res.status == 401) {
           router.push("/auth");
         }

@@ -10,10 +10,8 @@ const __dirname = join(__filename, "..");
 function createWindow() {
   const isDev = process.env.NODE_ENV === "development";
 
-  // В dev режиме используем исходный файл
-  const preloadPath = isDev
-    ? join(__dirname, "../../src/preload/preload.ts")
-    : join(__dirname, "../preload/preload.js");
+  // ВСЕГДА используем скомпилированный .js файл
+  const preloadPath = join(__dirname, "../preload/preload.js");
 
   const mainWindow = new BrowserWindow({
     width: 1200,

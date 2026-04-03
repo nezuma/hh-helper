@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import MainHeaderWithoutHouse from "./main-header-without-house.vue";
 
 const router = useRouter();
 const profile = ref<any>(null);
@@ -18,6 +19,9 @@ const checkAuth = async () => {
     if (response.ok) {
       const data = await response.json();
       profile.value = data;
+      // Сохраняем в localStorage
+      localStorage.setItem("profile", JSON.stringify(data));
+      router.push("/main");
     } else {
       profile.value = null;
     }
@@ -44,15 +48,7 @@ onMounted(() => {
 
 <template>
   <div class="app dark-theme" @mousemove="handleMouseMove" ref="appRef">
-    <header class="header">
-      <div class="header-left">
-        <h1 class="logo">HH Helper</h1>
-      </div>
-      <div class="header-right">
-        <button @click="openAuth" class="auth-btn">Войти</button>
-      </div>
-    </header>
-
+    <MainHeaderWithoutHouse />
     <main class="main">
       <div class="hero">
         <h1 class="title">hh.ru Помощник</h1>
@@ -84,78 +80,6 @@ onMounted(() => {
 
 .dark-theme {
   color: #fff;
-}
-
-.header {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.auth-btn {
-  padding: 8px 20px;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-}
-
-.auth-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform 0.2s;
-  overflow: hidden;
-  border: 2px solid #3b82f6;
-}
-
-.avatar:hover {
-  transform: scale(1.05);
-}
-
-.avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 18px;
-  color: white;
 }
 
 .main {
