@@ -1,29 +1,64 @@
-// src/main/main.ts
-import "dotenv/config";
+import { app, BrowserWindow, ipcMain, session } from "electron";
 import { join } from "path";
 import { fileURLToPath } from "url";
-import { app, BrowserWindow } from "electron";
+import { existsSync, writeFileSync, readFileSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = join(__filename, "..");
 
-function createWindow() {
-  const isDev = process.env.NODE_ENV === "development";
+let mainWindow: BrowserWindow | null = null;
 
-  // ВСЕГДА используем скомпилированный .js файл
-  const preloadPath = join(__dirname, "../preload/preload.js");
+const COOKIES_FILE = join(app.getPath("userData"), "hh_cookies.json");
+const HH_URL = "https://ramenskoe.hh.ru";
 
-  const mainWindow = new BrowserWindow({
+// Сохраняем куки для iframe
+const saveCookies = async () => {
+  const cookies = await session.defaultSession.cookies.get({ url: HH_URL });
+  writeFileSync(COOKIES_FILE, JSON.stringify(cookies, null, 2));
+};
+
+// Загружаем куки
+const loadCookies = async () => {
+  if (!existsSync(COOKIES_FILE)) return;
+  const cookies = JSON.parse(readFileSync(COOKIES_FILE, "utf-8"));
+  for (const cookie of cookies) {
+    try {
+      await session.defaultSession.cookies.set({
+        url: HH_URL,
+        name: cookie.name,
+        value: cookie.value,
+        domain: cookie.domain,
+        path: cookie.path,
+        secure: cookie.secure,
+        httpOnly: cookie.httpOnly,
+        expirationDate: cookie.expirationDate,
+      });
+    } catch (e) {}
+  }
+};
+
+ipcMain.handle("check-auth", async () => {
+  const cookies = await session.defaultSession.cookies.get({ url: HH_URL });
+  const hasAuth = cookies.some(
+    (c) => c.name === "hhrole" && c.value === "applicant",
+  );
+  return { isAuthorized: hasAuth };
+});
+
+async function createWindow() {
+  await loadCookies();
+
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-      preload: preloadPath,
-      nodeIntegration: false,
+      preload: join(__dirname, "../preload/preload.js"),
       contextIsolation: true,
+      webviewTag: true, // ← ЭТО ВАЖНО!
     },
   });
 
-  if (isDev) {
+  if (process.env.NODE_ENV === "development") {
     mainWindow.loadURL("http://localhost:5173");
     mainWindow.webContents.openDevTools();
   } else {
@@ -32,3 +67,6 @@ function createWindow() {
 }
 
 app.whenReady().then(createWindow);
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
+});

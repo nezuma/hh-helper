@@ -1,207 +1,203 @@
+<!-- src/renderer/views/MainView.vue -->
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
 import ProfileHeaderWithoutHouse from "../components/profile-header-without-house.vue";
-import { fetcher } from "../helpers";
-import Loading from "../components/loading.vue";
+import AppSidebar from "../components/app-sidebar.vue";
 
-const activeTab = ref("home");
-const showTooltip = ref(false);
-const loading = ref(true);
-const profile = ref();
-
-const botEnabled = ref(false);
-
-const responses = ref([
+const features = [
   {
-    company: 'ООО "ТехноСервис"',
-    position: "Frontend Developer",
-    status: "Отклик",
-    date: "15.03.2024",
+    icon: "🎯",
+    title: "Централизация откликов",
+    description:
+      "Все отклики с hh.ru и Habr Карьеры в одном месте. Больше не нужно переключаться между сайтами.",
+    color: "#3b82f6",
   },
   {
-    company: 'АО "Инновации+',
-    position: "Vue.js Developer",
-    status: "Собеседование",
-    date: "14.03.2024",
+    icon: "🤖",
+    title: "Автоматизация поиска",
+    description:
+      "Автоотклик и автоподъем резюме. Бот работает за вас 24/7, чтобы вы не пропустили лучшие вакансии.",
+    color: "#10b981",
   },
   {
-    company: 'ООО "ВебСтудия"',
-    position: "Junior Frontend",
-    status: "Отказ",
-    date: "12.03.2024",
+    icon: "📊",
+    title: "Детальная статистика",
+    description:
+      "Анализируйте эффективность поиска: количество откликов, приглашений, собеседований и отказов.",
+    color: "#f59e0b",
   },
   {
-    company: "ИП Иванов",
-    position: "Frontend Developer",
-    status: "Ожидание",
-    date: "10.03.2024",
+    icon: "⚡",
+    title: "Мгновенные уведомления",
+    description:
+      "Получайте уведомления о новых вакансиях, приглашениях и изменениях статуса откликов.",
+    color: "#8b5cf6",
   },
   {
-    company: 'ООО "АйтиРешения"',
-    position: "Vue Developer",
-    status: "Отклик",
-    date: "09.03.2024",
+    icon: "📱",
+    title: "Кроссплатформенность",
+    description:
+      "Работает на Windows, macOS и Linux. Все данные синхронизируются между устройствами.",
+    color: "#ec4899",
   },
-]);
+  {
+    icon: "🔒",
+    title: "Безопасность данных",
+    description:
+      "Ваши данные надежно зашифрованы. Мы не передаем информацию третьим лицам.",
+    color: "#6b7280",
+  },
+];
 
-const getStatusClass = (status: string) => {
-  switch (status) {
-    case "Отклик":
-      return "status-response";
-    case "Собеседование":
-      return "status-interview";
-    case "Отказ":
-      return "status-rejection";
-    case "Ожидание":
-      return "status-waiting";
-    default:
-      return "";
-  }
-};
-
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case "Отклик":
-      return "📧";
-    case "Собеседование":
-      return "🎯";
-    case "Отказ":
-      return "❌";
-    case "Ожидание":
-      return "⏳";
-    default:
-      return "📋";
-  }
-};
-onMounted(async () => {
-  profile.value = await fetcher({ url: "/profile", method: "GET" });
-  loading.value = !loading.value;
-});
+const stats = [
+  { value: "1000+", label: "Активных пользователей", icon: "👥" },
+  { value: "50K+", label: "Откликов отправлено", icon: "📧" },
+  { value: "5000+", label: "Успешных наймов", icon: "🎉" },
+  { value: "98%", label: "Довольных клиентов", icon: "⭐" },
+];
 </script>
 
 <template>
-  <Loading v-if="loading" />
-  <div v-else class="main-view">
+  <div class="main-view">
     <ProfileHeaderWithoutHouse />
-    <div class="content">
-      <aside class="sidebar">
-        <button
-          class="sidebar-btn"
-          :class="{ active: activeTab === 'home' }"
-          @click="activeTab = 'home'"
-        >
-          <svg
-            class="sidebar-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-8H9v8H5a2 2 0 0 1-2-2z"
-            />
-          </svg>
-          Главная
-        </button>
 
-        <button
-          class="sidebar-btn"
-          :class="{ active: activeTab === 'responses' }"
-          @click="activeTab = 'responses'"
-        >
-          <svg
-            class="sidebar-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-            />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-            <polyline points="10 9 9 9 8 9" />
-          </svg>
-          Отклики
-        </button>
-      </aside>
+    <div class="content">
+      <AppSidebar :active-tab="'main'" />
 
       <main class="main-content">
-        <div v-if="activeTab === 'home'" class="home-panel">
-          <div class="bot-control">
-            <h3 class="section-title">Управление ботом</h3>
-            <div class="control-card">
-              <div class="control-header">
-                <div class="control-title">
-                  <span class="control-label">Включить бота</span>
-                  <div
-                    class="warning-wrapper"
-                    @mouseenter="showTooltip = true"
-                    @mouseleave="showTooltip = false"
-                  >
-                    <svg
-                      class="warning-icon"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="12" y1="8" x2="12" y2="12" />
-                      <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                    <Transition name="tooltip">
-                      <div v-if="showTooltip" class="tooltip">
-                        Перед включением бота убедитесь в правильности его
-                        настроек.
-                      </div>
-                    </Transition>
-                  </div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" v-model="botEnabled" />
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
-          </div>
+        <!-- Hero секция -->
+        <div class="hero-section">
+          <h1 class="hero-title">Добро пожаловать в HH Helper!</h1>
+          <p class="hero-description">
+            Единый центр управления поиском работы. Все сервисы для успешного
+            трудоустройства в одном месте.
+          </p>
+        </div>
 
-          <div class="bot-settings">
-            <h3>Настройки бота</h3>
-            <p class="empty-settings">На данный момент настроек нет</p>
+        <!-- Статистика -->
+        <div class="stats-grid">
+          <div v-for="stat in stats" :key="stat.label" class="stat-card">
+            <div class="stat-icon">{{ stat.icon }}</div>
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
           </div>
         </div>
 
-        <div v-else-if="activeTab === 'responses'" class="responses-panel">
-          <div class="responses-list">
+        <!-- Возможности -->
+        <div class="features-section">
+          <h2 class="section-title">Возможности сервиса</h2>
+          <div class="features-grid">
             <div
-              v-for="(item, index) in responses"
-              :key="index"
-              class="response-item"
+              v-for="feature in features"
+              :key="feature.title"
+              class="feature-card"
             >
-              <div class="response-header">
-                <div class="response-company">
-                  <strong>{{ item.company }}</strong>
-                  <span class="response-position">{{ item.position }}</span>
-                </div>
-                <div
-                  class="response-status"
-                  :class="getStatusClass(item.status)"
-                >
-                  <span class="status-icon">{{
-                    getStatusIcon(item.status)
-                  }}</span>
-                  {{ item.status }}
-                </div>
+              <div class="feature-icon" :style="{ background: feature.color }">
+                {{ feature.icon }}
               </div>
-              <div class="response-date">{{ item.date }}</div>
+              <h3 class="feature-title">{{ feature.title }}</h3>
+              <p class="feature-description">{{ feature.description }}</p>
             </div>
           </div>
+        </div>
+
+        <!-- Как это работает -->
+        <div class="how-it-works">
+          <h2 class="section-title">Как это работает</h2>
+          <div class="steps">
+            <div class="step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h3>Авторизуйтесь в hh.ru</h3>
+                <p>Войдите в свой аккаунт на hh.ru через наше приложение</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3>Настройте бота</h3>
+                <p>Выберите параметры автоотклика и автоподъема резюме</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h3>Запустите бота</h3>
+                <p>Активируйте бота и он начнет работать за вас</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h3>Анализируйте результаты</h3>
+                <p>
+                  Смотрите статистику и получайте уведомления о новых откликах
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Преимущества -->
+        <div class="advantages">
+          <h2 class="section-title">Почему выбирают нас</h2>
+          <div class="advantages-grid">
+            <div class="advantage-item">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Экономия времени до 80%</span>
+            </div>
+            <div class="advantage-item">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Увеличение откликов в 3 раза</span>
+            </div>
+            <div class="advantage-item">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Персональные рекомендации</span>
+            </div>
+            <div class="advantage-item">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Круглосуточная поддержка</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+          <h3>Готовы начать?</h3>
+          <p>
+            Присоединяйтесь к тысячам пользователей, которые уже нашли работу с
+            HH Helper
+          </p>
+          <button class="cta-button" @click="$router.push('/main/hh')">
+            Начать использовать
+          </button>
         </div>
       </main>
     </div>
@@ -221,300 +217,310 @@ onMounted(async () => {
   min-height: calc(100vh - 80px);
 }
 
-.sidebar {
-  width: 240px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.main-content {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-.sidebar-btn {
+/* Hero секция */
+.hero-section {
+  text-align: center;
+  margin-bottom: 60px;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #fff, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-description {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Статистика */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.stat-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #60a5fa;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Секция возможностей */
+.features-section {
+  margin-bottom: 60px;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  margin-bottom: 40px;
+  background: linear-gradient(135deg, #fff, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.feature-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.feature-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.feature-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.feature-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+/* Как это работает */
+.how-it-works {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 32px;
+  padding: 48px;
+  margin-bottom: 60px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.step {
+  text-align: center;
+}
+
+.step-number {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin: 0 auto 16px;
+}
+
+.step-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.step-content p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+}
+
+/* Преимущества */
+.advantages {
+  margin-bottom: 60px;
+}
+
+.advantages-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.advantage-item {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
 }
 
-.sidebar-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateX(4px);
-}
-
-.sidebar-btn.active {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  border-color: transparent;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.sidebar-icon {
+.advantage-item svg {
   width: 20px;
   height: 20px;
+  color: #4ade80;
+  flex-shrink: 0;
 }
 
-.main-content {
-  flex: 1;
-}
-
-.home-panel {
-  animation: fadeIn 0.3s ease;
-}
-
-.section-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 24px;
-}
-
-.bot-control {
-  margin-bottom: 24px;
-}
-
-.control-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 24px;
-}
-
-.control-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.control-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.control-label {
-  font-size: 18px;
-  font-weight: 500;
-  color: white;
-}
-
-.warning-wrapper {
-  position: relative;
-  display: inline-flex;
-}
-
-.warning-icon {
-  width: 18px;
-  height: 18px;
-  color: #fbbf24;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.warning-icon:hover {
-  transform: scale(1.1);
-}
-
-.tooltip {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 12px;
-  padding: 8px 12px;
-  background: #1e1e2e;
-  color: white;
-  font-size: 12px;
-  border-radius: 8px;
-  white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 10;
-}
-
-.tooltip-enter-active,
-.tooltip-leave-active {
-  transition: all 0.2s ease;
-}
-
-.tooltip-enter-from {
-  opacity: 0;
-  transform: translateX(-50%) translateY(10px);
-}
-
-.tooltip-leave-to {
-  opacity: 0;
-  transform: translateX(-50%) translateY(10px);
-}
-
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 52px;
-  height: 28px;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.2);
-  transition: 0.3s;
-  border-radius: 34px;
-}
-
-.toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 22px;
-  width: 22px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.3s;
-  border-radius: 50%;
-}
-
-input:checked + .toggle-slider {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-}
-
-input:checked + .toggle-slider:before {
-  transform: translateX(24px);
-}
-
-.bot-settings {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 24px;
-}
-
-.bot-settings h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 16px;
-}
-
-.empty-settings {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 14px;
+/* CTA секция */
+.cta-section {
   text-align: center;
-  padding: 40px;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1),
+    rgba(37, 99, 235, 0.05)
+  );
+  border-radius: 32px;
+  padding: 48px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
-.responses-panel {
-  animation: fadeIn 0.3s ease;
+.cta-section h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
 }
 
-.responses-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.cta-section p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 24px;
 }
 
-.response-item {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 16px 20px;
+.cta-button {
+  padding: 14px 36px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  border-radius: 40px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
-.response-item:hover {
-  transform: translateX(4px);
-  background: rgba(255, 255, 255, 0.08);
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
 }
 
-.response-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.response-company {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.response-company strong {
-  font-size: 16px;
-  color: white;
-}
-
-.response-position {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.response-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.status-icon {
-  font-size: 14px;
-}
-
-.status-response {
-  background: rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
-}
-
-.status-interview {
-  background: rgba(34, 197, 94, 0.2);
-  color: #4ade80;
-}
-
-.status-rejection {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
-}
-
-.status-waiting {
-  background: rgba(251, 191, 36, 0.2);
-  color: #fbbf24;
-}
-
-.response-date {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 20px;
+  }
+
+  .hero-title {
+    font-size: 32px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .advantages-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .how-it-works {
+    padding: 32px 20px;
+  }
+
+  .cta-section {
+    padding: 32px 20px;
+  }
+
+  .cta-section h3 {
+    font-size: 24px;
   }
 }
 </style>

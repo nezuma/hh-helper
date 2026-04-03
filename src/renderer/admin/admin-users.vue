@@ -1,9 +1,10 @@
 <!-- src/renderer/views/admin/AdminUsersView.vue -->
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import ProfileHeaderWithHouse from "../components/profile-header-with-house.vue";
 import { useNotification } from "../composables/eventBus";
 import AdminSidebar from "../components/admin-sidebar.vue";
+import { fetcher } from "../helpers";
 
 const { showSuccess } = useNotification();
 const searchQuery = ref("");
@@ -27,111 +28,6 @@ const users = ref([
     },
     avatar: null,
     createdAt: "2024-01-15T10:00:00Z",
-  },
-  {
-    _id: "2",
-    login: "jane_smith",
-    email: "jane@example.com",
-    name: "Джейн Смит",
-    phone: "+7 999 234-56-78",
-    role: "moder",
-    accepted: true,
-    tariff: {
-      tariffName: "advanced",
-      tariffDuration: "2025-06-30",
-    },
-    avatar: null,
-    createdAt: "2024-02-20T10:00:00Z",
-  },
-  {
-    _id: "3",
-    login: "alex_wilson",
-    email: "alex@example.com",
-    name: "Алекс Уилсон",
-    phone: "+7 999 345-67-89",
-    role: "premium",
-    accepted: true,
-    tariff: {
-      tariffName: "premium",
-      tariffDuration: null,
-    },
-    avatar: null,
-    createdAt: "2024-03-10T10:00:00Z",
-  },
-  {
-    _id: "4",
-    login: "sarah_connor",
-    email: "sarah@example.com",
-    name: "Сара Коннор",
-    phone: "+7 999 456-78-90",
-    role: "applicant",
-    accepted: false,
-    tariff: {
-      tariffName: "base",
-      tariffDuration: null,
-    },
-    avatar: null,
-    createdAt: "2024-04-05T10:00:00Z",
-  },
-  {
-    _id: "5",
-    login: "mike_brown",
-    email: "mike@example.com",
-    name: "Майк Браун",
-    phone: "+7 999 567-89-01",
-    role: "applicant",
-    accepted: true,
-    tariff: {
-      tariffName: "base",
-      tariffDuration: null,
-    },
-    avatar: null,
-    createdAt: "2024-05-12T10:00:00Z",
-  },
-  {
-    _id: "6",
-    login: "emma_davis",
-    email: "emma@example.com",
-    name: "Эмма Дэвис",
-    phone: "+7 999 678-90-12",
-    role: "premium",
-    accepted: true,
-    tariff: {
-      tariffName: "premium",
-      tariffDuration: "2025-08-15",
-    },
-    avatar: null,
-    createdAt: "2024-06-01T10:00:00Z",
-  },
-  {
-    _id: "7",
-    login: "robert_johnson",
-    email: "robert@example.com",
-    name: "Роберт Джонсон",
-    phone: "+7 999 789-01-23",
-    role: "moder",
-    accepted: true,
-    tariff: {
-      tariffName: "advanced",
-      tariffDuration: "2025-04-20",
-    },
-    avatar: null,
-    createdAt: "2024-07-18T10:00:00Z",
-  },
-  {
-    _id: "8",
-    login: "lisa_white",
-    email: "lisa@example.com",
-    name: "Лиза Уайт",
-    phone: "+7 999 890-12-34",
-    role: "applicant",
-    accepted: false,
-    tariff: {
-      tariffName: "base",
-      tariffDuration: null,
-    },
-    avatar: null,
-    createdAt: "2024-08-22T10:00:00Z",
   },
 ]);
 
@@ -216,6 +112,10 @@ const getRoleColor = (role: string) => {
       return "#10b981";
   }
 };
+
+onMounted(async () => {
+  users.value = await fetcher({ url: "/admin/users", method: "GET" });
+});
 </script>
 
 <template>
@@ -282,9 +182,11 @@ const getRoleColor = (role: string) => {
                 </svg>
               </div>
               <div class="user-info">
-                <div class="user-name">{{ user.name || user.login }}</div>
-                <div class="user-login">{{ user.login }}</div>
-                <div class="user-phone">{{ user.phone }}</div>
+                <div class="user-name">
+                  {{ user.name ? user.name : "Без имени" }}
+                </div>
+                <div class="user-login">Почта: {{ user.email }}</div>
+                <div class="user-login">Логин: {{ user.login }}</div>
               </div>
               <div
                 class="user-role"
@@ -364,13 +266,8 @@ const getRoleColor = (role: string) => {
             </div>
 
             <div class="edit-field">
-              <label>Телефон</label>
-              <input type="text" v-model="editingUser.phone" />
-            </div>
-
-            <div class="edit-field">
               <label>Роль</label>
-              <select v-model="editingUser.role">
+              <select v-model="editingUser.role" class="custom-select">
                 <option value="applicant">Пользователь</option>
                 <option value="premium">Премиум</option>
                 <option value="moder">Модератор</option>
@@ -380,7 +277,7 @@ const getRoleColor = (role: string) => {
 
             <div class="edit-field">
               <label>Тариф</label>
-              <select v-model="selectedTariff">
+              <select v-model="selectedTariff" class="custom-select">
                 <option value="base">Базовый</option>
                 <option value="advanced">Расширенный</option>
                 <option value="premium">Премиум</option>
@@ -559,11 +456,6 @@ const getRoleColor = (role: string) => {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.user-phone {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
 .user-role {
   padding: 4px 12px;
   border-radius: 20px;
@@ -615,7 +507,7 @@ const getRoleColor = (role: string) => {
   background: #2a2a2e;
   border-radius: 20px;
   width: 90%;
-  max-width: 500px;
+  max-width: 700px;
   max-height: 85vh;
   overflow-y: auto;
   animation: modalFadeIn 0.2s ease;
@@ -625,12 +517,12 @@ const getRoleColor = (role: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 24px 28px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-header h2 {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: white;
 }
@@ -639,9 +531,14 @@ const getRoleColor = (role: string) => {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 28px;
+  font-size: 32px;
   cursor: pointer;
   transition: color 0.2s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-btn:hover {
@@ -649,20 +546,20 @@ const getRoleColor = (role: string) => {
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 28px;
 }
 
 .edit-avatar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 28px;
 }
 
 .avatar-preview {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   border-radius: 50%;
   display: flex;
@@ -671,48 +568,88 @@ const getRoleColor = (role: string) => {
 }
 
 .avatar-preview svg {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   color: white;
 }
 
 .change-avatar-btn {
-  padding: 6px 16px;
+  padding: 8px 20px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   color: white;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.change-avatar-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .edit-field {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .edit-field label {
   display: block;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 10px;
 }
 
-.edit-field input,
-.edit-field select {
-  width: 100%;
-  padding: 10px 14px;
+.edit-field input {
+  width: 95%;
+  padding: 12px 16px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
+  border-radius: 10px;
   color: white;
-  font-size: 14px;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.custom-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: white;
+  font-size: 15px;
+  transition: all 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+.custom-select:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: #3b82f6;
+}
+
+.custom-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.custom-select option {
+  background: #2a2a2e;
+  color: white;
+  padding: 10px;
 }
 
 .edit-field input:focus,
 .edit-field select:focus {
   outline: none;
   border-color: #3b82f6;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .edit-field input:disabled {
@@ -723,27 +660,32 @@ const getRoleColor = (role: string) => {
 .checkbox-label {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .checkbox-label input {
-  width: auto;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #3b82f6;
 }
 
 .modal-footer {
   display: flex;
-  gap: 12px;
-  padding: 20px 24px;
+  gap: 16px;
+  padding: 24px 28px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .cancel-btn,
 .save-btn {
   flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -828,6 +770,22 @@ const getRoleColor = (role: string) => {
 
   .users-title {
     font-size: 24px;
+  }
+
+  .modal-content {
+    max-width: 95%;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-header {
+    padding: 20px;
+  }
+
+  .modal-footer {
+    padding: 20px;
   }
 }
 </style>

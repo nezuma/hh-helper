@@ -25,7 +25,6 @@ const navigateTo = (path: string) => {
 
 const logout = () => {
   closeDropdown();
-  console.log("Logout");
   router.push("/");
 };
 

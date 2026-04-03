@@ -12,6 +12,11 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ["electron"],
+      output: {
+        format: "cjs",
+      },
     },
+    emptyOutDir: false,
+    minify: false,
   },
 });

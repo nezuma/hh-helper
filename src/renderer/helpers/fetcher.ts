@@ -1,6 +1,6 @@
 // Обновленный fetcher.ts
-import router from "../router/router";
 import { useNotification } from "../composables/eventBus";
+import router from "../router/router";
 import { setCookie } from "./setCookies";
 
 interface IFetcher {
@@ -9,10 +9,9 @@ interface IFetcher {
   body?: object;
   headers?: any;
 }
+const { showSuccess, showError } = useNotification();
 
 export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
-  const { showSuccess, showError } = useNotification();
-
   const api = import.meta.env.VITE_API_URL || "http://localhost:4000";
   const query = window.location.search;
 
@@ -29,7 +28,7 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
     if (data) {
       if (!res.ok && data.alert == true) {
         showError(data.msg || "Произошла ошибка");
-        if (res.status == 401 && res.url !== "/auth") {
+        if (res.status == 401 && window.location.pathname !== "/") {
           router.push("/auth");
         }
         return data;
@@ -68,5 +67,6 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
     } else {
       showError("Непредвиденная ошибка. Попробуйте позже.");
     }
+    // window.location.replace("/loading");
   }
 };

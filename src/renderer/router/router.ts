@@ -6,15 +6,27 @@ const routes = [
     name: "start",
     component: () => import("../components/main.vue"), // относительный путь
   },
-  {
-    path: "/auth",
-    name: "auth",
-    component: () => import("../pages/auth-page.vue"),
-  },
+
   {
     path: "/main",
     name: "main",
     component: () => import("../pages/main-page.vue"),
+  },
+  {
+    path: "/main/hh",
+    name: "hh",
+    component: () => import("../pages/main-hh-page.vue"),
+  },
+  {
+    path: "/main/habr",
+    name: "habr",
+    component: () => import("../pages/main-habr-page.vue"),
+  },
+
+  {
+    path: "/auth",
+    name: "auth",
+    component: () => import("../pages/auth-page.vue"),
   },
   {
     path: "/profile",
@@ -45,6 +57,11 @@ const routes = [
     path: "/register/success",
     name: "success-register",
     component: () => import("../pages/register-success-page.vue"),
+  },
+  {
+    path: "/loading",
+    name: "loading",
+    component: () => import("../components/loading.vue"),
   },
 
   {

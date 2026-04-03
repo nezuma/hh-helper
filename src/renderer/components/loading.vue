@@ -1,12 +1,24 @@
 <!-- src/renderer/views/LoadingView.vue -->
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { fetcher } from "../helpers";
 
 const router = useRouter();
 
 const goToHome = () => {
   router.push("/");
 };
+
+onMounted(async () => {
+  if (window.location.pathname === "/loading") {
+    (async () => {
+      await new Promise((resolve) => setTimeout(resolve, 15000));
+      await fetcher({ url: "/profile", method: "GET" });
+      router.push("/");
+    })();
+  }
+});
 </script>
 
 <template>

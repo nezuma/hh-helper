@@ -1,6 +1,10 @@
+// src/types/electron.d.ts
 export interface ElectronAPI {
-  ping: () => Promise<string>;
-  // СЮДА ДОБАВИШЬ ВСЕ СВОИ МЕТОДЫ
+  fetchNegotiations: () => Promise<{ success: boolean; html: string }>;
+  openHhAuth: () => Promise<{ success: boolean; message?: string }>;
+  checkAuth: () => Promise<{ isAuthorized: boolean }>;
+  onHhAuthSuccess: (callback: () => void) => void;
+  removeHhAuthListener: () => void;
 }
 
 declare global {

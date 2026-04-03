@@ -2,15 +2,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { delCookie, fetcher } from "../helpers";
+import { useNotification } from "../composables/eventBus";
+import ProfileHeaderWithHouse from "../components/profile-header-with-house.vue";
+
+const { showError } = useNotification();
 
 const router = useRouter();
 
-const user = ref({
-  name: "Алексей",
-  avatar: null,
-});
-
-const isDropdownOpen = ref(false);
 const showDeleteModal = ref(false);
 const showCancelSubscriptionModal = ref(false);
 const showPromoOfferModal = ref(false);
@@ -19,59 +18,54 @@ const discountCode = ref("");
 const passwordForm = ref({
   oldPassword: "",
   newPassword: "",
-  confirmPassword: "",
+  confirmNewPassword: "",
 });
 
 const nicknameForm = ref({
-  newNickname: "",
+  newName: "",
 });
 
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
-};
-
-const closeDropdown = () => {
-  isDropdownOpen.value = false;
-};
-
-const navigateTo = (path: string) => {
-  closeDropdown();
-  router.push(path);
-};
-
-const logout = () => {
-  closeDropdown();
-  console.log("Logout");
-  router.push("/");
-};
-
-const goToMain = () => {
-  router.push("/main");
-};
-
-const changePassword = () => {
-  if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-    alert("Новые пароли не совпадают");
+const changePassword = async () => {
+  if (
+    passwordForm.value.newPassword !== passwordForm.value.confirmNewPassword
+  ) {
+    showError("Новые пароли не совпадают");
     return;
   }
-  console.log("Password changed");
-  passwordForm.value = {
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  };
+
+  const res = await fetcher({
+    url: "/profile/settings?settingType=changePassword",
+    method: "PATCH",
+    body: passwordForm.value,
+  });
+
+  if (res.changePassword) {
+    delCookie("accessToken");
+    delCookie("refreshToken");
+    localStorage.removeItem("profile");
+    setTimeout(() => router.push("/auth"));
+  }
 };
 
-const changeNickname = () => {
-  if (nicknameForm.value.newNickname.trim()) {
-    user.value.name = nicknameForm.value.newNickname;
-    console.log("Nickname changed to:", nicknameForm.value.newNickname);
-    nicknameForm.value.newNickname = "";
+const changeNickname = async () => {
+  if (nicknameForm.value.newName.trim()) {
+    await fetcher({
+      url: "/profile/settings?settingType=changeName",
+      method: "PATCH",
+      body: nicknameForm.value,
+    });
+    const user = await fetcher({
+      url: "/profile",
+      method: "GET",
+    });
+    localStorage.removeItem("profile");
+    localStorage.setItem("profile", JSON.stringify(user));
+    window.location.reload();
   }
 };
 
 const confirmDeleteAccount = () => {
-  console.log("Account deleted");
+  showError("Функция в разработке");
   showDeleteModal.value = false;
   router.push("/");
 };
@@ -115,108 +109,7 @@ const copyPromoCode = () => {
 
 <template>
   <div class="settings-view">
-    <header class="header">
-      <div class="header-left">
-        <button class="back-btn" @click="goToMain">
-          <svg
-            class="home-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-8H9v8H5a2 2 0 0 1-2-2z"
-            />
-          </svg>
-        </button>
-        <h1 class="logo">HH Helper</h1>
-      </div>
-      <div class="header-right">
-        <div class="user-info" @click="toggleDropdown">
-          <span class="username">{{ user.name }}</span>
-          <div class="avatar">
-            <svg
-              v-if="!user.avatar"
-              class="avatar-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <img v-else :src="user.avatar" alt="avatar" class="avatar-img" />
-          </div>
-        </div>
-
-        <Transition name="dropdown">
-          <div v-if="isDropdownOpen" class="dropdown-menu">
-            <button @click="navigateTo('/profile')" class="dropdown-item">
-              <svg
-                class="dropdown-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              Мой профиль
-            </button>
-            <button @click="navigateTo('/tariffs')" class="dropdown-item">
-              <svg
-                class="dropdown-icon"
-                width="800px"
-                height="800px"
-                viewBox="0 0 24 24"
-                fill="#fff"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2ZM8.5,6.5a2,2,0,1,1-2,2A2,2,0,0,1,8.5,6.5Zm.207,10.207a1,1,0,1,1-1.414-1.414l8-8a1,1,0,1,1,1.414,1.414ZM15.5,17.5a2,2,0,1,1,2-2A2,2,0,0,1,15.5,17.5Z"
-                />
-              </svg>
-              Тарифы
-            </button>
-            <button @click="navigateTo('/settings')" class="dropdown-item">
-              <svg
-                class="dropdown-icon"
-                width="800px"
-                height="800px"
-                viewBox="0 0 16 16"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <circle cx="8" cy="8" r="1.75" />
-                <path
-                  d="m6.75 1.75-.5 1.5-1.5 1-2-.5-1 2 1.5 1.5v1.5l-1.5 1.5 1 2 2-.5 1.5 1 .5 1.5h2.5l.5-1.5 1.5-1 2 .5 1-2-1.5-1.5v-1.5l1.5-1.5-1-2-2 .5-1.5-1-.5-1.5z"
-                />
-              </svg>
-              Настройки
-            </button>
-            <button @click="logout" class="dropdown-item logout">
-              <svg
-                class="dropdown-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              Выйти
-            </button>
-          </div>
-        </Transition>
-      </div>
-    </header>
+    <ProfileHeaderWithHouse />
 
     <div class="settings-container">
       <h2 class="settings-title">Настройки</h2>
@@ -244,7 +137,7 @@ const copyPromoCode = () => {
             <label>Повторение пароля</label>
             <input
               type="password"
-              v-model="passwordForm.confirmPassword"
+              v-model="passwordForm.confirmNewPassword"
               placeholder="Повторите новый пароль"
             />
           </div>
@@ -261,7 +154,7 @@ const copyPromoCode = () => {
             <label>Новый никнейм</label>
             <input
               type="text"
-              v-model="nicknameForm.newNickname"
+              v-model="nicknameForm.newName"
               placeholder="Введите новый никнейм"
             />
           </div>

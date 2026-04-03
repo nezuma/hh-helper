@@ -202,7 +202,12 @@ onMounted(async () => {
             <div class="tariff-info">
               <div class="tariff-name">Расширенный</div>
               <div class="tariff-count">
-                {{ analytics.usersByTariff.advanced }} пользователей
+                {{
+                  analytics.usersByTariff.advanced
+                    ? analytics.usersByTariff.advanced
+                    : 0
+                }}
+                пользователей
               </div>
             </div>
           </div>
@@ -211,7 +216,12 @@ onMounted(async () => {
             <div class="tariff-info">
               <div class="tariff-name">Премиум</div>
               <div class="tariff-count">
-                {{ analytics.usersByTariff.premium }} пользователей
+                {{
+                  analytics.usersByTariff.premium
+                    ? analytics.usersByTariff.premium
+                    : 0
+                }}
+                пользователей
               </div>
             </div>
           </div>

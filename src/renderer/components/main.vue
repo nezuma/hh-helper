@@ -3,6 +3,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import MainHeaderWithoutHouse from "./main-header-without-house.vue";
+import { fetcher } from "../helpers";
 
 const router = useRouter();
 const profile = ref<any>(null);
@@ -11,22 +12,11 @@ const mouseY = ref(0);
 const appRef = ref<HTMLElement | null>(null);
 
 const checkAuth = async () => {
-  try {
-    const response = await fetch("http://localhost:4000/profile", {
-      credentials: "include",
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      profile.value = data;
-      // Сохраняем в localStorage
-      localStorage.setItem("profile", JSON.stringify(data));
-      router.push("/main");
-    } else {
-      profile.value = null;
-    }
-  } catch (error) {
-    profile.value = null;
+  const response = await fetcher({ url: "/profile", method: "GET" });
+  if (response.type != "error") {
+    profile.value = response;
+    localStorage.setItem("profile", JSON.stringify(response));
+    router.push("/main");
   }
 };
 

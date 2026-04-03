@@ -1,7 +1,21 @@
 <!-- src/renderer/views/admin/AdminMainView.vue -->
 <script setup lang="ts">
-import ProfileHeaderWithHouse from "../components/profile-header-with-house.vue";
+import { onMounted, ref } from "vue";
 import AdminSidebar from "../components/admin-sidebar.vue";
+import ProfileHeaderWithHouse from "../components/profile-header-with-house.vue";
+import { fetcher } from "../helpers";
+
+const data = ref({
+  usersCount: 0,
+  usersCountWithTariffs: 0,
+  newUsersCount: 0,
+  adminsCount: 0,
+});
+
+onMounted(async () => {
+  const response = await fetcher({ url: "/admin/main", method: "GET" });
+  data.value = response;
+});
 </script>
 
 <template>
@@ -21,19 +35,21 @@ import AdminSidebar from "../components/admin-sidebar.vue";
 
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-value">0</div>
+              <div class="stat-value">{{ data.usersCount }}</div>
               <div class="stat-label">Пользователей</div>
             </div>
             <div class="stat-card">
-              <div class="stat-value">0</div>
+              <div class="stat-value">
+                {{ data.usersCountWithTariffs }}
+              </div>
               <div class="stat-label">Активных подписок</div>
             </div>
             <div class="stat-card">
-              <div class="stat-value">0</div>
-              <div class="stat-label">Откликов сегодня</div>
+              <div class="stat-value">{{ data.adminsCount }}</div>
+              <div class="stat-label">Администраторы</div>
             </div>
             <div class="stat-card">
-              <div class="stat-value">0</div>
+              <div class="stat-value">{{ data.newUsersCount }}</div>
               <div class="stat-label">Новых пользователей</div>
             </div>
           </div>
