@@ -1,196 +1,52 @@
-<!-- src/renderer/views/TariffsView.vue -->
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, ref } from "vue";
+import ProfileHeaderWithHouse from "../components/profile-header-with-house.vue";
 import { fetcher } from "../helpers";
 
-const router = useRouter();
+const currentTariffId = ref();
+const tariffs = ref();
 
-const user = ref({
-  name: "Алексей",
-  avatar: null,
-});
-
-const isDropdownOpen = ref(false);
-const currentTariff = ref("Базовый");
-
-const tariffs = [
-  {
-    name: "Базовый",
-    price: "0 ₽",
-    period: "бессрочно",
-    features: {
-      "Просмотр откликов": true,
-      "Главная страница": true,
-      "Включение бота": true,
-      Автоотклик: false,
-      "Автоподъем резюме": false,
-      "Приоритетная поддержка": false,
-    },
-    popular: false,
-  },
-  {
-    name: "Расширенный",
-    price: "199 ₽",
-    period: "в месяц",
-    features: {
-      "Просмотр откликов": true,
-      "Главная страница": true,
-      "Включение бота": true,
-      Автоотклик: true,
-      "Автоподъем резюме": false,
-      "Приоритетная поддержка": false,
-    },
-    popular: true,
-  },
-  {
-    name: "Премиум",
-    price: "299 ₽",
-    period: "в месяц",
-    features: {
-      "Просмотр откликов": true,
-      "Главная страница": true,
-      "Включение бота": true,
-      Автоотклик: true,
-      "Автоподъем резюме": true,
-      "Приоритетная поддержка": true,
-    },
-    popular: false,
-  },
-];
-
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
+// Маппинг ключей в читаемые названия
+const featureNames: Record<string, string> = {
+  choose_response: "Просмотр откликов",
+  main_page: "Главная страница",
+  activate_bot: "Активация бота",
+  autoresponse: "Автоотклик",
+  autoboost_vacancy: "Автоподнятие вакансии",
+  priority_help: "Приоритетная поддержка",
 };
 
-const closeDropdown = () => {
-  isDropdownOpen.value = false;
-};
+// Функция для преобразования объекта features в массив с названиями
+const getFeatureList = (features: Record<string, boolean>) => {
+  if (!features) return [];
 
-const navigateTo = (path: string) => {
-  closeDropdown();
-  router.push(path);
-};
-
-const logout = () => {
-  closeDropdown();
-  console.log("Logout");
-  router.push("/");
-};
-
-const goToMain = () => {
-  router.push("/main");
+  return Object.entries(features).map(([key, value]) => ({
+    name: featureNames[key] || key, // если нет в маппинге, показываем оригинальный ключ
+    enabled: value,
+  }));
 };
 
 const selectTariff = (tariffName: string) => {
   console.log(`Выбран тариф: ${tariffName}`);
 };
+
+onMounted(async () => {
+  const response = await fetcher({
+    url: "/profile/tariffs",
+    method: "GET",
+  });
+  tariffs.value = response;
+  const user = await fetcher({
+    url: "/profile",
+    method: "GET",
+  });
+  currentTariffId.value = user.tariff.tariffId;
+});
 </script>
 
 <template>
   <div class="tariffs-view">
-    <header class="header">
-      <div class="header-left">
-        <button class="back-btn" @click="goToMain">
-          <svg
-            class="home-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-8H9v8H5a2 2 0 0 1-2-2z"
-            />
-          </svg>
-        </button>
-        <h1 class="logo">HH Helper</h1>
-      </div>
-      <div class="header-right">
-        <div class="user-info" @click="toggleDropdown">
-          <span class="username">{{ user.name }}</span>
-          <div class="avatar">
-            <svg
-              v-if="!user.avatar"
-              class="avatar-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <img v-else :src="user.avatar" alt="avatar" class="avatar-img" />
-          </div>
-        </div>
-
-        <Transition name="dropdown">
-          <div v-if="isDropdownOpen" class="dropdown-menu">
-            <button @click="navigateTo('/profile')" class="dropdown-item">
-              <svg
-                class="dropdown-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              Мой профиль
-            </button>
-            <button @click="navigateTo('/tariffs')" class="dropdown-item">
-              <svg
-                class="dropdown-icon"
-                fill="#fff"
-                width="800px"
-                height="800px"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2ZM8.5,6.5a2,2,0,1,1-2,2A2,2,0,0,1,8.5,6.5Zm.207,10.207a1,1,0,1,1-1.414-1.414l8-8a1,1,0,1,1,1.414,1.414ZM15.5,17.5a2,2,0,1,1,2-2A2,2,0,0,1,15.5,17.5Z"
-                />
-              </svg>
-              Тарифы
-            </button>
-            <button @click="navigateTo('/settings')" class="dropdown-item">
-              <svg
-                class="dropdown-icon"
-                width="800px"
-                height="800px"
-                viewBox="0 0 16 16"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <circle cx="8" cy="8" r="1.75" />
-                <path
-                  d="m6.75 1.75-.5 1.5-1.5 1-2-.5-1 2 1.5 1.5v1.5l-1.5 1.5 1 2 2-.5 1.5 1 .5 1.5h2.5l.5-1.5 1.5-1 2 .5 1-2-1.5-1.5v-1.5l1.5-1.5-1-2-2 .5-1.5-1-.5-1.5z"
-                />
-              </svg>
-              Настройки
-            </button>
-            <button @click="logout" class="dropdown-item logout">
-              <svg
-                class="dropdown-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              Выйти
-            </button>
-          </div>
-        </Transition>
-      </div>
-    </header>
+    <ProfileHeaderWithHouse />
 
     <div class="tariffs-container">
       <div class="tariffs-header">
@@ -205,30 +61,32 @@ const selectTariff = (tariffName: string) => {
           class="tariff-card"
           :class="{
             popular: tariff.popular,
-            current: currentTariff === tariff.name,
+            current: currentTariffId === tariff._id,
           }"
         >
           <div v-if="tariff.popular" class="popular-badge">Популярный</div>
-          <div v-if="currentTariff === tariff.name" class="current-badge">
+          <div v-if="currentTariffId === tariff._id" class="current-badge">
             Текущий
           </div>
 
           <div class="tariff-header">
             <h3 class="tariff-name">{{ tariff.name }}</h3>
             <div class="tariff-price">
-              <span class="price">{{ tariff.price }}</span>
+              <span class="price">{{
+                tariff.price === 0 ? "Бесплатно" : String(tariff.price) + " ₽"
+              }}</span>
               <span class="period">{{ tariff.period }}</span>
             </div>
           </div>
 
           <div class="tariff-features">
             <div
-              v-for="(value, feature) in tariff.features"
-              :key="feature"
+              v-for="feature in getFeatureList(tariff.features)"
+              :key="feature.name"
               class="feature-item"
             >
               <svg
-                v-if="value"
+                v-if="feature.enabled"
                 class="check-icon"
                 viewBox="0 0 24 24"
                 fill="none"
@@ -247,17 +105,17 @@ const selectTariff = (tariffName: string) => {
               >
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-              <span class="feature-name">{{ feature }}</span>
+              <span class="feature-name">{{ feature.name }}</span>
             </div>
           </div>
 
           <button
             class="select-btn"
-            :class="{ active: currentTariff !== tariff.name }"
-            :disabled="currentTariff === tariff.name"
+            :class="{ active: currentTariffId !== tariff._id }"
+            :disabled="currentTariffId === tariff._id"
             @click="selectTariff(tariff.name)"
           >
-            {{ currentTariff === tariff.name ? "Активен" : "Выбрать" }}
+            {{ currentTariffId === tariff._id ? "Активен" : "Выбрать" }}
           </button>
         </div>
       </div>
