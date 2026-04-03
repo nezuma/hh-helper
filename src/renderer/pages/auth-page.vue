@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import AuthModal from "../components/auth-modal.vue";
 import { useRouter } from "vue-router";
-import { fetcher, getCookie } from "../helpers";
+import { fetcher, setCookie } from "../helpers";
 
 const router = useRouter();
 
@@ -11,9 +11,18 @@ const handleClose = () => {
 };
 
 const handleLogin = async (data: { login: string; password: string }) => {
-  if (!localStorage.getItem("profile") && !getCookie("accessToken")) {
-  }
-  await fetcher({ url: "/auth", method: "POST", body: data });
+  const res = await fetcher({ url: "/auth", method: "POST", body: data });
+  localStorage.setItem("profile", JSON.stringify(res.profile));
+  setCookie(
+    "accessToken",
+    res.tokens.accessToken,
+    Number(new Date()) + 5 * 60 * 1000,
+  );
+  setCookie(
+    "refreshToken",
+    res.tokens.refreshToken,
+    Number(new Date()) + 7 * 24 * 60 * 60 * 1000,
+  );
   router.push("/main");
 };
 

@@ -23,13 +23,13 @@ export const fetcher = async ({ url, method, body, headers }: IFetcher) => {
       body: JSON.stringify(body),
       credentials: "include",
     });
-
-    const data = await res.json();
+    console.log(res);
+    const data = res.body ? await res.json() : res;
 
     if (data) {
       if (!res.ok && data.alert == true) {
         showError(data.msg || "Произошла ошибка");
-        if (res.status == 401) {
+        if (res.status == 401 && res.url !== "/auth") {
           router.push("/auth");
         }
         return data;

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-const router = useRouter();
+import { fetcher } from "../helpers";
 
+const router = useRouter();
 const user = localStorage.getItem("profile");
 const userData = user ? JSON.parse(user) : null;
+const userRole = ref<string | null>(null);
 
 const isDropdownOpen = ref(false);
 
@@ -30,6 +32,27 @@ const logout = () => {
 const goToMain = () => {
   router.push("/main");
 };
+
+const isAdminOrModer = () => {
+  return userRole.value === "admin" || userRole.value === "moder";
+};
+
+// Получаем роль с сервера для защиты от подмены в localStorage
+const fetchUserRole = async () => {
+  try {
+    const response = await fetcher({ url: "/profile", method: "GET" });
+    if (response && response.role) {
+      userRole.value = response.role;
+    }
+  } catch (error) {
+    console.error("Ошибка получения роли:", error);
+    userRole.value = null;
+  }
+};
+
+onMounted(() => {
+  fetchUserRole();
+});
 </script>
 
 <template>
@@ -117,6 +140,26 @@ const goToMain = () => {
             </svg>
             Настройки
           </button>
+
+          <button
+            v-if="isAdminOrModer()"
+            @click="navigateTo('/admin/main')"
+            class="dropdown-item admin-item"
+          >
+            <svg
+              class="dropdown-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+              />
+            </svg>
+            Админ-панель
+          </button>
+
           <button @click="logout" class="dropdown-item logout">
             <svg
               class="dropdown-icon"
@@ -294,5 +337,13 @@ const goToMain = () => {
 .dropdown-icon {
   width: 18px;
   height: 18px;
+}
+
+.dropdown-item.admin-item {
+  margin-bottom: 4px;
+}
+
+.dropdown-item.admin-item:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 </style>

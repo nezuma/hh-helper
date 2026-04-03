@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { delCookie } from "../helpers";
+import { delCookie, fetcher } from "../helpers";
 
 const router = useRouter();
 
 const isDropdownOpen = ref(false);
+const userRole = ref<string | null>(null);
 
 const user = localStorage.getItem("profile");
 const userData = user ? JSON.parse(user) : null;
+
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
 };
+
 const closeDropdown = () => {
   isDropdownOpen.value = false;
 };
@@ -28,6 +31,27 @@ const logout = () => {
   localStorage.removeItem("profile");
   router.push("/");
 };
+
+const isAdminOrModer = () => {
+  return userRole.value === "admin" || userRole.value === "moder";
+};
+
+// Получаем роль с сервера для защиты от подмены в localStorage
+const fetchUserRole = async () => {
+  try {
+    const response = await fetcher({ url: "/profile", method: "GET" });
+    if (response && response.role) {
+      userRole.value = response.role;
+    }
+  } catch (error) {
+    console.error("Ошибка получения роли:", error);
+    userRole.value = null;
+  }
+};
+
+onMounted(() => {
+  fetchUserRole();
+});
 </script>
 
 <template>
@@ -71,6 +95,7 @@ const logout = () => {
             </svg>
             Мой профиль
           </button>
+
           <button @click="navigateTo('/tariffs')" class="dropdown-item">
             <svg
               class="dropdown-icon"
@@ -84,9 +109,9 @@ const logout = () => {
                 d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2ZM8.5,6.5a2,2,0,1,1-2,2A2,2,0,0,1,8.5,6.5Zm.207,10.207a1,1,0,1,1-1.414-1.414l8-8a1,1,0,1,1,1.414,1.414ZM15.5,17.5a2,2,0,1,1,2-2A2,2,0,0,1,15.5,17.5Z"
               />
             </svg>
-
             Тарифы
           </button>
+
           <button @click="navigateTo('/settings')" class="dropdown-item">
             <svg
               class="dropdown-icon"
@@ -108,6 +133,26 @@ const logout = () => {
             </svg>
             Настройки
           </button>
+
+          <button
+            v-if="isAdminOrModer()"
+            @click="navigateTo('/admin/main')"
+            class="dropdown-item admin-item"
+          >
+            <svg
+              class="dropdown-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+              />
+            </svg>
+            Админ-панель
+          </button>
+
           <button @click="logout" class="dropdown-item logout">
             <svg
               class="dropdown-icon"
@@ -243,6 +288,14 @@ const logout = () => {
 }
 
 .dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-item.admin-item {
+  margin-bottom: 4px;
+}
+
+.dropdown-item.admin-item:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 

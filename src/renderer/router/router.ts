@@ -46,6 +46,32 @@ const routes = [
     name: "success-register",
     component: () => import("../pages/register-success-page.vue"),
   },
+
+  {
+    path: "/admin/main",
+    name: "admin-main",
+    component: () => import("../admin/admin-main.vue"),
+  },
+  {
+    path: "/admin/analytics",
+    name: "admin-analytics",
+    component: () => import("../admin/admin-analytics.vue"),
+  },
+  {
+    path: "/admin/users",
+    name: "admin-users",
+    component: () => import("../admin/admin-users.vue"),
+  },
+  {
+    path: "/admin/tariffs",
+    name: "admin-tariffs",
+    component: () => import("../admin/admin-tariffs.vue"),
+  },
+  {
+    path: "/admin/service",
+    name: "admin-service",
+    component: () => import("../admin/admin-service.vue"),
+  },
 ];
 
 const router = createRouter({

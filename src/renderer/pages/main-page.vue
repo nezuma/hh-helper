@@ -2,10 +2,12 @@
 import { onMounted, ref } from "vue";
 import ProfileHeaderWithoutHouse from "../components/profile-header-without-house.vue";
 import { fetcher } from "../helpers";
+import Loading from "../components/loading.vue";
 
 const activeTab = ref("home");
 const showTooltip = ref(false);
 const loading = ref(true);
+const profile = ref();
 
 const botEnabled = ref(false);
 
@@ -71,18 +73,15 @@ const getStatusIcon = (status: string) => {
       return "📋";
   }
 };
-const check = async () => {
-  await fetcher({ url: "/profile", method: "GET" });
-  loading.value = false;
-};
-
 onMounted(async () => {
-  await check();
+  profile.value = await fetcher({ url: "/profile", method: "GET" });
+  loading.value = !loading.value;
 });
 </script>
 
 <template>
-  <div class="main-view">
+  <Loading v-if="loading" />
+  <div v-else class="main-view">
     <ProfileHeaderWithoutHouse />
     <div class="content">
       <aside class="sidebar">
