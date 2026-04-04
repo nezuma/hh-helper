@@ -6,10 +6,7 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "dist:win": "npm run build && electron-builder --win",
-    "dist:mac": "npm run build && electron-builder --mac",
-    "dist:linux": "npm run build && electron-builder --linux",
-    "build:preload": "vite build --config vite.preload.config.ts"
+    "pack": "npx electron-packager . HHHelper --platform=win32 --arch=x64 --out=release-builds --overwrite --prune=false"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

@@ -5,3 +5,4 @@ release/
 *.log
 .env
 package-lock.json
+release-builds

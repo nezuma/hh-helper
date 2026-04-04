@@ -17,6 +17,30 @@ const HABR_CAREER_URL = "https://career.habr.com";
 const HABR_AUTH_URL =
   "https://career.habr.com/?utm_source=habr_account&utm_medium=habr_top_panel";
 
+const setupSession = async () => {
+  // Разрешаем все cookies
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const cookies = details.responseHeaders?.["set-cookie"];
+    if (cookies) {
+      // Модифицируем cookies, добавляя SameSite=None и Secure где нужно
+      const modifiedCookies = cookies.map((cookie) => {
+        if (!cookie.includes("SameSite")) {
+          cookie += "; SameSite=None";
+        }
+        if (!cookie.includes("Secure") && details.url.startsWith("https://")) {
+          cookie += "; Secure";
+        }
+        return cookie;
+      });
+      details.responseHeaders!["set-cookie"] = modifiedCookies;
+    }
+    callback({ responseHeaders: details.responseHeaders });
+  });
+
+  // Разрешаем сохранение cookies
+  await session.defaultSession.cookies.flushStore();
+};
+
 // Загрузка сохраненных данных habr
 const loadHabrData = async () => {
   if (existsSync(HABR_COOKIES_FILE)) {
@@ -108,6 +132,7 @@ ipcMain.handle("habr-authenticate", async () => {
         nodeIntegration: false,
         contextIsolation: true,
         webviewTag: true,
+        partition: "persist:habr", // Сохранять cookies между сессиями
       },
     });
 
@@ -297,6 +322,7 @@ ipcMain.handle("habr-clear-auth", async () => {
 
 // Создание главного окна
 async function createWindow() {
+  await setupSession();
   await loadHabrData();
 
   mainWindow = new BrowserWindow({

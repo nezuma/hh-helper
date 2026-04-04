@@ -1,12 +1,43 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
+  /**
+   * Страницы без авторизации
+   */
   {
     path: "/",
     name: "start",
     component: () => import("../components/main.vue"), // относительный путь
   },
+  {
+    path: "/privacy-policy",
+    name: "privacy-policy",
+    component: () => import("../pages/privacy-policy-page.vue"),
+  },
 
+  /**
+   * Регистрация и авторизация
+   */
+  {
+    path: "/register/accept",
+    name: "auth-accept",
+    component: () => import("../pages/register-accept-page.vue"),
+  },
+  {
+    path: "/register/success",
+    name: "success-register",
+    component: () => import("../pages/register-success-page.vue"),
+  },
+  {
+    path: "/auth",
+    name: "auth",
+    component: () => import("../pages/auth-page.vue"),
+  },
+
+  /**
+   * Авторизованным пользователям
+   * Мейн странички и странички поиска работы
+   */
   {
     path: "/main",
     name: "main",
@@ -23,11 +54,9 @@ const routes = [
     component: () => import("../pages/main-habr-page.vue"),
   },
 
-  {
-    path: "/auth",
-    name: "auth",
-    component: () => import("../pages/auth-page.vue"),
-  },
+  /**
+   * Профиль
+   */
   {
     path: "/profile",
     name: "profile",
@@ -43,27 +72,30 @@ const routes = [
     name: "settings",
     component: () => import("../pages/settings-page.vue"),
   },
+
+  /**
+   * Тикеты
+   */
   {
-    path: "/register/accept",
-    name: "auth-accept",
-    component: () => import("../pages/register-accept-page.vue"),
+    path: "/tickets",
+    component: () => import("../tickets/tickets-page.vue"),
   },
   {
-    path: "/privacy-policy",
-    name: "privacy-policy",
-    component: () => import("../pages/privacy-policy-page.vue"),
+    path: "/tickets/help",
+    component: () => import("../tickets/tickets-page.vue"),
   },
   {
-    path: "/register/success",
-    name: "success-register",
-    component: () => import("../pages/register-success-page.vue"),
+    path: "/tickets/propose",
+    component: () => import("../tickets/tickets-page.vue"),
   },
   {
-    path: "/loading",
-    name: "loading",
-    component: () => import("../components/loading.vue"),
+    path: "/tickets/:id",
+    component: () => import("../tickets/tickets-detail-page.vue"),
   },
 
+  /**
+   * АДМИНКА
+   */
   {
     path: "/admin/main",
     name: "admin-main",
@@ -88,6 +120,24 @@ const routes = [
     path: "/admin/service",
     name: "admin-service",
     component: () => import("../admin/admin-service.vue"),
+  },
+  {
+    path: "/admin/tickets",
+    name: "admin-tickets",
+    component: () => import("../admin/admin-tickets.vue"),
+  },
+
+  // loading
+  {
+    path: "/loading",
+    name: "loading",
+    component: () => import("../components/loading.vue"),
+  },
+
+  // fall-back
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/",
   },
 ];
 
