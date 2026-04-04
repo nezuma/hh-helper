@@ -126,6 +126,11 @@ const routes = [
     name: "admin-tickets",
     component: () => import("../admin/admin-tickets.vue"),
   },
+  {
+    path: "/admin/notifications",
+    name: "admin-notifications",
+    component: () => import("../admin/admin-notifications.vue"),
+  },
 
   // loading
   {
