@@ -12,38 +12,38 @@ const features = [
     color: "#3b82f6",
   },
   {
-    icon: "🤖",
-    title: "Автоматизация поиска",
-    description:
-      "Автоотклик и автоподъем резюме. Бот работает за вас 24/7, чтобы вы не пропустили лучшие вакансии.",
-    color: "#10b981",
-  },
-  {
     icon: "📊",
     title: "Детальная статистика",
     description:
       "Анализируйте эффективность поиска: количество откликов, приглашений, собеседований и отказов.",
-    color: "#f59e0b",
+    color: "#10b981",
   },
   {
     icon: "⚡",
     title: "Мгновенные уведомления",
     description:
       "Получайте уведомления о новых вакансиях, приглашениях и изменениях статуса откликов.",
-    color: "#8b5cf6",
+    color: "#f59e0b",
   },
   {
     icon: "📱",
     title: "Кроссплатформенность",
     description:
       "Работает на Windows, macOS и Linux. Все данные синхронизируются между устройствами.",
-    color: "#ec4899",
+    color: "#8b5cf6",
   },
   {
     icon: "🔒",
     title: "Безопасность данных",
     description:
       "Ваши данные надежно зашифрованы. Мы не передаем информацию третьим лицам.",
+    color: "#ec4899",
+  },
+  {
+    icon: "🎨",
+    title: "Удобный интерфейс",
+    description:
+      "Интуитивно понятный дизайн, который помогает быстро находить нужную информацию и управлять откликами.",
     color: "#6b7280",
   },
 ];
@@ -53,6 +53,33 @@ const stats = [
   { value: "50K+", label: "Откликов отправлено", icon: "📧" },
   { value: "5000+", label: "Успешных наймов", icon: "🎉" },
   { value: "98%", label: "Довольных клиентов", icon: "⭐" },
+];
+
+const securityFeatures = [
+  {
+    icon: "🍪",
+    title: "Только cookies",
+    description:
+      "Мы не храним ваши логины и пароли от других сервисов. Используются только cookies для поддержания сессии.",
+  },
+  {
+    icon: "🔐",
+    title: "Локальное шифрование",
+    description:
+      "Все данные хранятся локально на вашем устройстве и надежно зашифрованы.",
+  },
+  {
+    icon: "🚫",
+    title: "Нет передачи данных",
+    description:
+      "Мы не передаем ваши данные третьим лицам. Вся информация остается только у вас.",
+  },
+  {
+    icon: "✅",
+    title: "Прозрачность",
+    description:
+      "Вы всегда можете посмотреть, какие данные хранятся в приложении и удалить их в любой момент.",
+  },
 ];
 </script>
 
@@ -107,32 +134,46 @@ const stats = [
             <div class="step">
               <div class="step-number">1</div>
               <div class="step-content">
-                <h3>Авторизуйтесь в hh.ru</h3>
-                <p>Войдите в свой аккаунт на hh.ru через наше приложение</p>
+                <h3>Авторизуйтесь в сервисах</h3>
+                <p>Войдите в hh.ru и Habr Карьеру через наше приложение</p>
               </div>
             </div>
             <div class="step">
               <div class="step-number">2</div>
               <div class="step-content">
-                <h3>Настройте бота</h3>
-                <p>Выберите параметры автоотклика и автоподъема резюме</p>
+                <h3>Управляйте откликами</h3>
+                <p>Просматривайте и управляйте всеми откликами в одном месте</p>
               </div>
             </div>
             <div class="step">
               <div class="step-number">3</div>
               <div class="step-content">
-                <h3>Запустите бота</h3>
-                <p>Активируйте бота и он начнет работать за вас</p>
+                <h3>Получайте уведомления</h3>
+                <p>Мгновенные оповещения о новых приглашениях и сообщениях</p>
               </div>
             </div>
             <div class="step">
               <div class="step-number">4</div>
               <div class="step-content">
                 <h3>Анализируйте результаты</h3>
-                <p>
-                  Смотрите статистику и получайте уведомления о новых откликах
-                </p>
+                <p>Смотрите статистику и отслеживайте прогресс поиска работы</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Безопасность -->
+        <div class="security-section">
+          <h2 class="section-title">Ваша безопасность — наш приоритет</h2>
+          <div class="security-grid">
+            <div
+              v-for="item in securityFeatures"
+              :key="item.title"
+              class="security-card"
+            >
+              <div class="security-icon">{{ item.icon }}</div>
+              <h3 class="security-title">{{ item.title }}</h3>
+              <p class="security-description">{{ item.description }}</p>
             </div>
           </div>
         </div>
@@ -183,7 +224,7 @@ const stats = [
               >
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              <span>Круглосуточная поддержка</span>
+              <span>Безопасное хранение данных</span>
             </div>
           </div>
         </div>
@@ -402,6 +443,51 @@ const stats = [
   line-height: 1.4;
 }
 
+/* Безопасность */
+.security-section {
+  margin-bottom: 60px;
+}
+
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.security-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  transition: all 0.2s;
+}
+
+.security-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.security-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.security-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #10b981;
+  margin-bottom: 12px;
+}
+
+.security-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
 /* Преимущества */
 .advantages {
   margin-bottom: 60px;
@@ -476,6 +562,7 @@ const stats = [
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
 }
 
+/* Адаптация под планшеты */
 @media (max-width: 1024px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -486,33 +573,145 @@ const stats = [
   }
 
   .features-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .security-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* Адаптация под телефоны */
 @media (max-width: 768px) {
   .content {
-    padding: 20px;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .main-content {
+    padding: 0;
+  }
+
+  .hero-section {
+    padding: 32px 16px;
+    margin-bottom: 32px;
   }
 
   .hero-title {
-    font-size: 32px;
+    font-size: 28px;
+  }
+
+  .hero-description {
+    font-size: 16px;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+  }
+
+  .section-title {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .feature-card {
+    padding: 20px;
+  }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .feature-title {
+    font-size: 18px;
+  }
+
+  .how-it-works {
+    padding: 24px 16px;
+    margin-bottom: 40px;
   }
 
   .steps {
     grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .step {
+    text-align: left;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .step-number {
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-content h3 {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  .step-content p {
+    font-size: 13px;
+  }
+
+  .security-section {
+    margin-bottom: 40px;
+  }
+
+  .security-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .security-card {
+    padding: 20px;
+  }
+
+  .security-icon {
+    font-size: 36px;
+  }
+
+  .security-title {
+    font-size: 16px;
+  }
+
+  .advantages {
+    margin-bottom: 40px;
   }
 
   .advantages-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .how-it-works {
-    padding: 32px 20px;
+  .advantage-item {
+    padding: 10px 16px;
+    font-size: 13px;
   }
 
   .cta-section {
@@ -520,7 +719,61 @@ const stats = [
   }
 
   .cta-section h3 {
+    font-size: 22px;
+  }
+
+  .cta-section p {
+    font-size: 14px;
+  }
+
+  .cta-button {
+    padding: 12px 28px;
+    font-size: 14px;
+  }
+}
+
+/* Адаптация под маленькие телефоны */
+@media (max-width: 480px) {
+  .content {
+    padding: 12px;
+  }
+
+  .hero-title {
     font-size: 24px;
+  }
+
+  .hero-description {
+    font-size: 14px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .feature-title {
+    font-size: 16px;
+  }
+
+  .feature-description {
+    font-size: 13px;
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .step-content h3 {
+    font-size: 14px;
+  }
+
+  .step-content p {
+    font-size: 12px;
+  }
+
+  .cta-section h3 {
+    font-size: 20px;
   }
 }
 </style>
